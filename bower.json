@@ -1,0 +1,9 @@
+{
+  "name": "betamaxmas",
+  "private": true,
+  "dependencies": {
+    "bootstrap-sass-official": "~3.2.0",
+    "modernizr": "~2.8.2",
+    "Class.js": "~1.0.0"
+  }
+}

@@ -1,0 +1,34 @@
+@import "compass/reset";
+
+//Sprites - http://compass-style.org/help/tutorials/spriting/
+@import "compass/utilities/sprites";
+@import "spritesrc/*.png";
+@include all-spritesrc-sprites;
+
+* {
+	box-sizing: border-box;
+}
+
+html,body {
+	background-color:#000;
+	height:100%;
+}
+
+.container {
+	display:block;
+	width:100%;
+	height:100%;
+	background-image:url('../images/bg.jpg');
+
+	&:after {
+		box-shadow: inset 0 0 40em #000000;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 2;
+		content: "";
+	}
+}
+
