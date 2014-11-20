@@ -1,12 +1,84 @@
 var TVGuide = Class.extend({
-	init: function(channelData) {
-		this.channelData = channelData;
+	init: function(channelData, start) {
+		var c, s, show, playTime,longestDurationTime,
+		sortedChannelData = [];
+
+		for(var c=0; c < channelData.channels.length; c++) {
+			playTime = 0;
+			for(var s=0; s < channelData.channels[c].shows.length; s++) {
+				show 				= channelData.channels[c].shows[s];
+				show.start 			= playTime;
+				sortedChannelData.push(channelData.channels[c].shows[s]);
+				playTime += show.duration;
+			}
+		}
+
+		sortedChannelData.sort(function(a,b) {
+			a > b ? -1 : 1;
+		});
+
+		//We now have a sorted playlist to run through, but it's start time was on Jan 1, 1970.
+		//What is the longest runtime of any of the channels?
+		longestDurationTime = Number.NEGATIVE_INFINITY;
+		for(c = 0; c < channelData.channels.length; c++) {
+			if (channelData.channels[c].duration > longestDurationTime) {
+				longestDurationTime = channelData.channels[c].duration;
+			}
+		}
+
+		var localStart = start % longestDurationTime;
+
+		//Find the start of the playlist.
+		playtime = 0;
+
+
+
+
+
 	}
 });
 
 var RemoteControl = Class.extend({
-	init: function() {
+	init: function(volumeUpHandler, volumeDownHandler, channelUpHandler, channelDownHandler) {
+		this.volumeDownHandler = volumeDownHandler;
+		this.volumeUpHandler = volumeUpHandler;
 
+		this.channelDownHandler = channelDownHandler;
+		this.channelUpHandler = channelUpHandler;
+
+		$('#remote #chan-up').click($.proxy(this.clickHandler, this));
+		$('#remote #chan-down').click($.proxy(this.clickHandler, this));
+		$('#remote #vol-up').click($.proxy(this.clickHandler, this));
+		$('#remote #vol-down').click($.proxy(this.clickHandler, this));
+	},
+	lock: function() {
+		this.isLocked = true;
+	},
+	unlock: function() {
+		this.isLocked = false;
+	},
+	clickHandler: function(e) {
+		if (this.isLocked) {
+			return;
+		}
+		switch($(e.currentTarget).attr('id')) {
+			case 'chan-up':
+				this.channelUpHandler();
+				//this.onChannelUpClick();
+			break;
+			case 'chan-down':
+				this.channelDownHandler();
+				//this.onChannelDownClick();
+			break;
+			case 'vol-up':
+				this.volumeUpHandler();
+				//this.onVolumeUpClick();
+			break;
+			case 'vol-down':
+				this.volumeDownHandler();
+				//this.onVolumeDownClick();
+			break;
+		}
 	}
 }); 
 
@@ -37,6 +109,8 @@ var Betamaxmas = Class.extend(
 		onPlaylistLoaded: function(playlist) {
 			this.playlist 	= playlist;
 			this.startTime 	= this.getNow();
+
+			this.tvguide  	= new TVGuide(this.playlist, this.startTime);
 			console.log(playlist);
 			this.injectYTScript();
 		},
@@ -52,15 +126,18 @@ var Betamaxmas = Class.extend(
 			firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 		},
 		onYTPlayerReady: function() {
+			//Set up remote.
+			this.remote = new RemoteControl($.proxy(this.onVolumeUpClick, this), $.proxy(this.onVolumeDownClick, this), $.proxy(this.onChannelUpClick, this), $.proxy(this.onChannelDownClick, this));
+
 			var randChannelIndex = this.getRandomInt(0, this.playlist.channels.length-1);
 			this.changeChannelByIndex(randChannelIndex);
 		},
 		onPlayerReady: function() {
-			console.log('onPlayerReady', arguments);
+			//console.log('onPlayerReady', arguments);
 		},
 		onPlayerStateChange: function(st) {
 
-			console.log('onPlayerStateChange', st.data);
+			//console.log('onPlayerStateChange', st.data);
 			switch(st.data) {
 				case -1: //unstarted
 				break;
@@ -68,6 +145,7 @@ var Betamaxmas = Class.extend(
 					this.nextVideo();
 				break;
 				case 1: //playing
+
 					this.player.mute();
 				break;
 				case 2: //paused
@@ -107,7 +185,22 @@ var Betamaxmas = Class.extend(
 				this.player.loadVideoById(currentShow.show.id, currentShow.offset);
 			}
 		},
-
+		onVolumeUpClick: function() {
+			var currentVolume = this.player.getVolume(),
+			newVolume = currentVolume + 10;
+			this.player.setVolume(newVolume);
+		},
+		onVolumeDownClick: function() {
+			var currentVolume = this.player.getVolume(),
+			newVolume = currentVolume - 10;
+			this.player.setVolume(newVolume);
+		},
+		onChannelUpClick: function() {
+			this.nextChannel();
+		},
+		onChannelDownClick: function() {
+			this.prevChannel();
+		},
 
 		//CHANNELS
 		getCurrentShow: function() {
@@ -145,7 +238,6 @@ var Betamaxmas = Class.extend(
 			//console.log(this.channel.number);
 
 			this.nextVideo();
-			
 		},
 		nextChannel: function() {
 			this.changeChannelByIndex(this.channelIndex + 1);

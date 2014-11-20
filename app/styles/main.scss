@@ -19,9 +19,12 @@ html,body {
 	width:100%;
 	height:100%;
 	background-image:url('../images/bg.jpg');
-
+	position:absolute;
+	top:0;
+	left:0;
+	overflow:hidden;
 	&:after {
-		box-shadow: inset 0 0 50em #000000;
+		box-shadow: inset 0 0 10em 4em #000000;
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -31,12 +34,66 @@ html,body {
 		content: "";
 	}
 
+	#remote {
+		position:absolute;
+		right:60px;
+		top:50%;
+		margin-top:-170px;
+		background-image:url('../images/remote.png');
+		width:150px;
+		height:308px;
+		z-index:3;
+		.btn {
+			&:hover {
+				cursor:pointer;
+			}
+			cursor:pointer;
+			position:absolute;
+			width:29px;
+			height:29px;
+			//box-shadow:3px 3px 3px #000;
+			&.down {
+				top:140px;
+				background-image:url('../images/remote-btn-down.png');
+			}
+			&.up {
+				top:85px;
+				background-image:url('../images/remote-btn-up.png');	
+			}
+			&.chan {
+				left:38px;
+			}
+			&.vol {
+				left:83px;
+			}
+		}
+		
+	}
+
 	#tv {
+		$w:664px;
+		position:absolute;
+		top:80px;
+		left:50%;
+		margin-left:-$w/2;
+
 		#facade {
 			background-image:url('../images/tv.png');
-			max-width:900px;
-			min-width:300px;
-			height:900px;
+			background-size:100%;
+			width:$w;
+			height:1000px;
+			position:absolute;
+			top:0;
+			left:0;
+			z-index:1;
+		}
+		#screen {
+			z-index:0;
+			position:absolute;
+			left:45px;
+			top:165px;
+			width:439px;
+			height:335px;
 		}
 		//position:relative;
 		//width:800px;
