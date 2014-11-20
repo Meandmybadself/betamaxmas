@@ -1,4 +1,14 @@
+var TVGuide = Class.extend({
+	init: function(channelData) {
+		this.channelData = channelData;
+	}
+});
 
+var RemoteControl = Class.extend({
+	init: function() {
+
+	}
+}); 
 
 var Betamaxmas = Class.extend(
 	{
@@ -49,25 +59,73 @@ var Betamaxmas = Class.extend(
 			console.log('onPlayerReady', arguments);
 		},
 		onPlayerStateChange: function(st) {
-			//console.log('onPlayerStateChange', arguments);
-			switch(st) {
+
+			console.log('onPlayerStateChange', st.data);
+			switch(st.data) {
 				case -1: //unstarted
 				break;
 				case 0: //ended
+					this.nextVideo();
 				break;
 				case 1: //playing
+					this.player.mute();
 				break;
 				case 2: //paused
+				case 5:
 				break;
 				case 3: //buffering
 				break;
-				case 5: //video cued.
-				break;
+			}
+		},
+		//Next video
+		nextVideo: function() {
+			var currentShow = this.getCurrentShow();
+			if (!this.player) {
+				this.player = new YT.Player('screen', {
+					width:$('#screen').width(),
+					height:$('#screen').height(),
+					videoId:currentShow.show.id,
+					playerVars:{
+						disablekb:true,
+						autoplay:1,
+						controls:0,
+						enablejsapi:true,
+						iv_load_policy:3,
+						modestbranding:1,
+						origin:document.location.hostname,
+						playsinline:1,
+						rel:0,
+						showinfo:0,
+						start:currentShow.offset
+					},
+					events: {
+						'onReady':$.proxy(this.onPlayerReady, this),
+						'onStateChange':$.proxy(this.onPlayerStateChange, this)
+					}
+				});	
+			} else {
+				this.player.loadVideoById(currentShow.show.id, currentShow.offset);
 			}
 		},
 
 
 		//CHANNELS
+		getCurrentShow: function() {
+			//Where are we at in the current channel playlist?
+			var now = this.getPlaylistNow() % this.channel.duration,
+			show,
+			showIndex = 0,
+			shows = this.channel.shows;
+			while(now > 0) {
+				show = shows[showIndex++];
+				now -= show.duration;
+			}
+
+			return {
+				show:show,
+				offset:-now
+			}
+		},
 		changeChannelByIndex: function(index) {
 			//Where are we in the current playlist?
 			if (index == this.channelIndex) {
@@ -84,46 +142,10 @@ var Betamaxmas = Class.extend(
 			//Set current channel.
 			this.channelIndex 	= index;
 			this.channel 		= this.playlist.channels[this.channelIndex];
-			console.log(this.channel.number);
+			//console.log(this.channel.number);
 
-			//Where are we at in the current channel playlist?
-			var now = this.getPlaylistNow() % this.channel.duration,
-			show,
-			showIndex = 0,
-			shows = this.channel.shows;
-			while(now > 0) {
-				show = shows[showIndex++];
-				now -= show.duration;
-			}
-
-			this.player = new YT.Player('screen', {
-				width:$('#screen').width(),
-				height:$('#screen').height(),
-				videoId:show.id,
-				playerVars:{
-					disablekb:true,
-					autoplay:1,
-					controls:0,
-					enablejsapi:true,
-					iv_load_policy:3,
-					modestbranding:1,
-					origin:document.location.hostname,
-					playsinline:1,
-					rel:0,
-					showinfo:0,
-					start:-now
-				},
-				events: {
-					'onReady':$.proxy(this.onPlayerReady, this),
-					'onStateChange':$.proxy(this.onPlayerStateChange, this)
-				}
-			});
+			this.nextVideo();
 			
-
-
-
-
-
 		},
 		nextChannel: function() {
 			this.changeChannelByIndex(this.channelIndex + 1);
