@@ -143,9 +143,10 @@ var Betamaxmas = Class.extend(
 				break;
 				case 0: //ended
 					this.nextVideo();
+					$('#noise').removeClass('playing');
 				break;
 				case 1: //playing
-
+					$('#noise').addClass('playing');
 					this.player.mute();
 				break;
 				case 2: //paused

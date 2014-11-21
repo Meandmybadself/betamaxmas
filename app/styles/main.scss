@@ -24,14 +24,25 @@ html,body {
 	left:0;
 	overflow:hidden;
 	&:after {
-		box-shadow: inset 0 0 10em 4em #000000;
+		box-shadow: inset 0 0 15em 5em #000000;
 		position: absolute;
 		top: 0;
 		left: 0;
 		width: 100%;
 		height: 100%;
-		z-index: 2;
+		z-index: 3;
 		content: "";
+	}
+
+	#couch {
+		position:absolute;
+		bottom:0;
+		width:1419px;
+		height:285px;
+		z-index:3;
+		background-image:url('../images/couch.png');
+		left:50%;
+		margin-left:-700px;
 	}
 
 	#remote {
@@ -46,12 +57,15 @@ html,body {
 		.btn {
 			&:hover {
 				cursor:pointer;
+				box-shadow:0px 0px 0px rgba(0,0,0,0);
 			}
 			cursor:pointer;
 			position:absolute;
-			width:29px;
-			height:29px;
-			//box-shadow:3px 3px 3px #000;
+			width:25px;
+			height:25px;
+			background-color:transparent;
+			box-shadow:2px 2px 2px rgba(0,0,0,0.5);
+			transition:box-shadow .2s ease;
 			&.down {
 				top:140px;
 				background-image:url('../images/remote-btn-down.png');
@@ -67,13 +81,48 @@ html,body {
 				left:83px;
 			}
 		}
-		
+	}
+
+	#footer {
+		width:591px;
+		height:95px;
+		position:absolute;
+		left:0;
+		bottom:20px;
+		left:50%;
+		margin-left:-300px;
+		background-image:url('../images/footer.png');
+		z-index:3;
+		font-family: 'Oswald', sans-serif;
+		div {
+			position:absolute;
+			top:55px;
+			&#about {
+				left:90px;
+			}
+			&#mail {
+				left:250px;
+			}
+			&#pr {
+				left:375px;
+			}
+			a {
+				text-decoration:none;
+				color:#444;
+				text-transform:uppercase;
+				transition:color .1s ease-in-out;
+				text-shadow: 0 0 2px rgba(0,0,0,0.25);
+				&:hover {
+					color:#A58A50;
+				}
+			}
+		}
 	}
 
 	#tv {
 		$w:664px;
 		position:absolute;
-		top:80px;
+		top:20px;
 		left:50%;
 		margin-left:-$w/2;
 
@@ -85,15 +134,28 @@ html,body {
 			position:absolute;
 			top:0;
 			left:0;
-			z-index:1;
+			z-index:2;
 		}
-		#screen {
-			z-index:0;
+		#noise, #screen {
 			position:absolute;
 			left:45px;
 			top:165px;
 			width:439px;
 			height:335px;
+		}
+		#noise {
+			z-index:1;
+			background-image:url('../images/noise.gif');
+
+			background-position-x:90px;
+			background-position-y:90px;
+			transition:opacity .5s ease;
+			&.playing {
+				opacity:0;
+			}
+		}
+		#screen {
+			z-index:0;
 		}
 		//position:relative;
 		//width:800px;
