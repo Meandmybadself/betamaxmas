@@ -41,6 +41,11 @@ module.exports = function (grunt) {
       dist: {
         options: {
           noLineComments:true,
+          sourcemap:false,
+          imagesDir:'<%= config.app %>/images',
+          fontsDir:'<% config.app %>/fonts',
+          sassDir:'<%= config.app %>/styles',
+          cssDir:'<%= config.dist %>/styles'
         }
       }
     },
@@ -52,7 +57,9 @@ module.exports = function (grunt) {
       },
       dist: {
         options: {
-          src: "<&= config.dist %>",
+          src: "<&= config.dist %>/",
+          host:"betamaxmas@www.betamaxmas.com",
+          dest:"/betamaxmas/betamaxmas.com/v2/"
           //Define these on a per-project basis
           //host:"user@hostname"
           //dest: "/path/to/webroot"
@@ -361,9 +368,10 @@ module.exports = function (grunt) {
     'uglify',
     'copy:dist',
     'modernizr',
-    'rev',
+   // 'rev',
     'usemin',
-    'htmlmin'
+    'htmlmin',
+   // 'rsync'
   ]);
 
   grunt.registerTask('default', [

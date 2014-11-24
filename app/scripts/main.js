@@ -64,19 +64,15 @@ var RemoteControl = Class.extend({
 		switch($(e.currentTarget).attr('id')) {
 			case 'chan-up':
 				this.channelUpHandler();
-				//this.onChannelUpClick();
 			break;
 			case 'chan-down':
 				this.channelDownHandler();
-				//this.onChannelDownClick();
 			break;
 			case 'vol-up':
 				this.volumeUpHandler();
-				//this.onVolumeUpClick();
 			break;
 			case 'vol-down':
 				this.volumeDownHandler();
-				//this.onVolumeDownClick();
 			break;
 		}
 	}
@@ -89,7 +85,7 @@ var Betamaxmas = Class.extend(
 				playlistURL:'http://local/betamaxmas-data/'
 			},
 			prod:{
-
+				playlistURL:'./data/'
 			}
 		},
 		init:function() {
@@ -103,7 +99,7 @@ var Betamaxmas = Class.extend(
 		
 		//PLAYLIST
 		loadPlaylist: function() {
-			$.getJSON(this.cfg.playlistURL, $.proxy(this.onPlaylistLoaded, this));
+			$.getJSON(this.cfg.playlistURL, $.proxy(this.onPlaylistLoaded, this)).error(function() { alert('Couldn\'t communicate with server.  Please try again.')});
 			this.channel = Math.rand
 		},
 		onPlaylistLoaded: function(playlist) {
@@ -131,6 +127,23 @@ var Betamaxmas = Class.extend(
 
 			var randChannelIndex = this.getRandomInt(0, this.playlist.channels.length-1);
 			this.changeChannelByIndex(randChannelIndex);
+			this.onResize();
+			$(window).resize($.proxy(this.onResize, this));
+			$('.container').addClass('started');
+			$('#about').click($.proxy(this.onAboutClick, this));
+			$('#about-note').click($.proxy(this.onAboutCloseClick, this));
+		},
+		onAboutClick: function() {
+			if (!$('#about-note').hasClass('show')) {
+				$('#about-note').addClass('show');	
+			} else {
+				this.onAboutCloseClick();
+			}
+		},
+		onAboutCloseClick: function() {
+			if ($('#about-note').hasClass('show')) {
+				$('#about-note').removeClass('show');	
+			} 
 		},
 		onPlayerReady: function() {
 			//console.log('onPlayerReady', arguments);
@@ -153,6 +166,7 @@ var Betamaxmas = Class.extend(
 				case 5:
 				break;
 				case 3: //buffering
+					$('#noise').removeClass('playing');
 				break;
 			}
 		},
@@ -185,6 +199,10 @@ var Betamaxmas = Class.extend(
 			} else {
 				this.player.loadVideoById(currentShow.show.id, currentShow.offset);
 			}
+			var title = currentShow.show.title;
+			document.title = "betamaxmas - " + title;
+			console.log('Now playing ' + title + ' with an offset of: ' + currentShow.offset);
+
 		},
 		onVolumeUpClick: function() {
 			var currentVolume = this.player.getVolume(),
@@ -236,7 +254,7 @@ var Betamaxmas = Class.extend(
 			//Set current channel.
 			this.channelIndex 	= index;
 			this.channel 		= this.playlist.channels[this.channelIndex];
-			//console.log(this.channel.number);
+			$('#noise').addClass('playing');
 
 			this.nextVideo();
 		},
@@ -245,6 +263,43 @@ var Betamaxmas = Class.extend(
 		},
 		prevChannel: function() {
 			this.changeChannelByIndex(this.channelIndex - 1);
+		},
+
+		onResize: function() {
+			var ww 	= $(window).width(),
+			wh 		= $(window).height(),
+
+
+			//original tv size  600x865
+			ow 		= 600,
+			oh 		= 865,
+
+			//space from the top of the tv image to the top of the tv.
+			oybuff 	= 50,
+
+			//original video size
+			ovw 	= 389,
+			ovh 	= 291,
+
+			nw 		= Math.max(360, 0.3 * ww),
+			per 	= nw / ow,
+			nh 		= per * oh,
+			
+			//tv y
+			top 		= ((wh - (ovh * per)) * .5) - (oybuff * per) - 100;
+			left 		= (ww - nw) * .5
+		
+
+			$('#tv').css({
+				'width':nw,
+				'height':nh,
+				'left':left,
+				'top':top
+			})
+
+			
+
+			//what percentage of 600
 		},
 
 
