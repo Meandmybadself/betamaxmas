@@ -1,0 +1,456 @@
+/* line 5, ../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.1.0.alpha.3/stylesheets/compass/reset/_utilities.scss */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+/* line 22, ../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.1.0.alpha.3/stylesheets/compass/reset/_utilities.scss */
+html {
+  line-height: 1;
+}
+
+/* line 24, ../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.1.0.alpha.3/stylesheets/compass/reset/_utilities.scss */
+ol, ul {
+  list-style: none;
+}
+
+/* line 26, ../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.1.0.alpha.3/stylesheets/compass/reset/_utilities.scss */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* line 28, ../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.1.0.alpha.3/stylesheets/compass/reset/_utilities.scss */
+caption, th, td {
+  text-align: left;
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+/* line 30, ../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.1.0.alpha.3/stylesheets/compass/reset/_utilities.scss */
+q, blockquote {
+  quotes: none;
+}
+/* line 103, ../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.1.0.alpha.3/stylesheets/compass/reset/_utilities.scss */
+q:before, q:after, blockquote:before, blockquote:after {
+  content: "";
+  content: none;
+}
+
+/* line 32, ../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.1.0.alpha.3/stylesheets/compass/reset/_utilities.scss */
+a img {
+  border: none;
+}
+
+/* line 116, ../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.1.0.alpha.3/stylesheets/compass/reset/_utilities.scss */
+article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
+  display: block;
+}
+
+/* line 48, spritesrc/*.png */
+.spritesrc-sprite, .spritesrc-blank {
+  background-image: url('/app/images/spritesrc-sa67edb64d3.png');
+  background-repeat: no-repeat;
+}
+
+/* line 84, ../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.1.0.alpha.3/stylesheets/compass/utilities/sprites/_base.scss */
+.spritesrc-blank {
+  background-position: 0 0;
+}
+
+/* line 8, main.scss */
+* {
+  box-sizing: border-box;
+}
+
+/* line 12, main.scss */
+html, body {
+  background-color: #000;
+  height: 100%;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  48% {
+    opacity: 0;
+  }
+  51% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@-webkit-keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  48% {
+    opacity: 0;
+  }
+  51% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+/* line 46, main.scss */
+.container {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-image: url("../images/bg.jpg");
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  opacity: 0;
+  -webkit-transition: opacity 1s ease-out;
+          transition: opacity 1s ease-out;
+}
+/* line 57, main.scss */
+.container.started {
+  opacity: 1;
+}
+/* line 62, main.scss */
+.container:after {
+  -webkit-transition: box-shadow 2s ease;
+          transition: box-shadow 2s ease;
+  box-shadow: inset 0 0 15em 6em #000000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9;
+  content: "";
+}
+/* line 74, main.scss */
+.container #about-note {
+  visibility: hidden;
+  cursor: pointer;
+  top: 50%;
+  left: 50%;
+  opacity: 0;
+  -webkit-transition: opacity .3s ease-out, margin-top .3s ease-out;
+          transition: opacity .3s ease-out, margin-top .3s ease-out;
+  margin-left: -200px;
+  margin-top: -100px;
+  width: 400px;
+  height: 241px;
+  position: absolute;
+  z-index: 20;
+  background-size: 100%;
+  background-image: url("../images/about.png");
+}
+/* line 90, main.scss */
+.container #about-note.show {
+  visibility: visible;
+  opacity: 1;
+  margin-top: -120px;
+}
+/* line 98, main.scss */
+.container .poster {
+  position: absolute;
+  display: block;
+  width: 330px;
+  height: 500px;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  box-shadow: 0px 0px 2px 2px black;
+  -webkit-filter: blur(10px);
+          filter: blur(10px);
+  z-index: 0;
+}
+/* line 111, main.scss */
+.container .poster.left {
+  transform: rotateZ(-1deg);
+  -webkit-transform: rotateZ(-1deg);
+  top: -35px;
+  right: -25px;
+  background-image: url("../images/posters/01.jpg");
+}
+@media (max-width: 600px) {
+  /* line 111, main.scss */
+  .container .poster.left {
+    display: none;
+  }
+}
+/* line 122, main.scss */
+.container .poster.right {
+  transform: rotateZ(2deg);
+  -webkit-transform: rotateZ(2deg);
+  top: 0px;
+  left: -40px;
+  background-image: url("../images/posters/02.jpg");
+}
+@media (max-width: 600px) {
+  /* line 122, main.scss */
+  .container .poster.right {
+    display: none;
+  }
+}
+/* line 136, main.scss */
+.container #couch {
+  position: absolute;
+  bottom: -50px;
+  width: 1419px;
+  height: 285px;
+  z-index: 18;
+  background-image: url("../images/couch.png");
+  left: 50%;
+  margin-left: -700px;
+}
+/* line 147, main.scss */
+.container #remote {
+  position: absolute;
+  right: 60px;
+  top: 50%;
+  margin-top: -150px;
+  background-image: url("../images/remote.png");
+  width: 150px;
+  height: 308px;
+  z-index: 17;
+}
+@media (max-width: 780px) {
+  /* line 147, main.scss */
+  .container #remote {
+    display: none;
+  }
+}
+/* line 159, main.scss */
+.container #remote .btn {
+  cursor: pointer;
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  background-color: transparent;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+  -webkit-transition: box-shadow .2s ease;
+          transition: box-shadow .2s ease;
+}
+/* line 160, main.scss */
+.container #remote .btn:hover {
+  cursor: pointer;
+  box-shadow: 0px 0px 0px transparent;
+}
+/* line 171, main.scss */
+.container #remote .btn.down {
+  top: 140px;
+  background-image: url("../images/remote-btn-down.png");
+}
+/* line 175, main.scss */
+.container #remote .btn.up {
+  top: 85px;
+  background-image: url("../images/remote-btn-up.png");
+}
+/* line 179, main.scss */
+.container #remote .btn.chan {
+  left: 38px;
+}
+/* line 182, main.scss */
+.container #remote .btn.vol {
+  left: 83px;
+}
+/* line 188, main.scss */
+.container #footer {
+  position: absolute;
+  left: 0;
+  bottom: 20px;
+  left: 50%;
+  background-image: url("../images/footer.png");
+  background-size: 100%;
+  z-index: 19;
+  font-family: 'Oswald', sans-serif;
+}
+@media (min-width: 401px) {
+  /* line 188, main.scss */
+  .container #footer {
+    width: 591px;
+    height: 95px;
+    margin-left: -300px;
+  }
+  /* line 194, main.scss */
+  .container #footer div {
+    top: 57%;
+  }
+}
+@media (max-width: 400px) {
+  /* line 188, main.scss */
+  .container #footer {
+    width: 350px;
+    height: 56px;
+    margin-left: -175px;
+  }
+  /* line 203, main.scss */
+  .container #footer div {
+    top: 68%;
+    font-size: .6em;
+  }
+}
+/* line 220, main.scss */
+.container #footer div {
+  position: absolute;
+}
+/* line 223, main.scss */
+.container #footer div#about {
+  left: 15%;
+}
+/* line 226, main.scss */
+.container #footer div#mail {
+  left: 30%;
+}
+/* line 229, main.scss */
+.container #footer div#v1 {
+  left: 45%;
+}
+/* line 232, main.scss */
+.container #footer div#pr {
+  left: 63%;
+}
+/* line 235, main.scss */
+.container #footer div a {
+  text-decoration: none;
+  color: #444;
+  text-transform: uppercase;
+  -webkit-transition: color .1s ease-in-out;
+          transition: color .1s ease-in-out;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.25);
+}
+/* line 241, main.scss */
+.container #footer div a:hover {
+  color: #A58A50;
+}
+/* line 250, main.scss */
+.container #tv {
+  position: absolute;
+  width: 25%;
+}
+/* line 255, main.scss */
+.container #tv #time {
+  width: 6.9%;
+  height: 1.9%;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-image: url("../images/time.png");
+  position: absolute;
+  z-index: 21;
+  left: 54.5%;
+  top: 52%;
+  -webkit-transition: opacity 3s ease-in-out;
+          transition: opacity 3s ease-in-out;
+  animation: blink 3s steps(5, start) infinite;
+  -webkit-animation: blink normal 3s infinite;
+}
+/* line 270, main.scss */
+.container #tv .antenna {
+  display: block;
+  background-image: url("../images/antenna.png");
+  width: 292px;
+  height: 9px;
+  position: absolute;
+  z-index: 4;
+}
+/* line 278, main.scss */
+.container #tv .antenna.left {
+  left: 44%;
+  -webkit-transform-origin: 0% 50%;
+  -webkit-transform: rotateZ(-135deg);
+  transform: rotateZ(-135deg);
+}
+/* line 284, main.scss */
+.container #tv .antenna.right {
+  left: 51%;
+  -webkit-transform-origin: 0% 50%;
+  -webkit-transform: rotateZ(-45deg);
+  transform: rotateZ(-45deg);
+}
+/* line 292, main.scss */
+.container #tv .facade {
+  position: absolute;
+  z-index: 16;
+  background-size: 100%;
+}
+/* line 300, main.scss */
+.container #tv .facade.top {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 10%;
+  background-image: url("../images/tv-top.png");
+}
+/* line 308, main.scss */
+.container #tv .facade.left, .container #tv .facade.right {
+  top: 10%;
+}
+/* line 311, main.scss */
+.container #tv .facade.left {
+  width: 11%;
+  height: 28.15%;
+  background-image: url("../images/tv-left.png");
+}
+/* line 316, main.scss */
+.container #tv .facade.right {
+  width: 30.16%;
+  right: 0;
+  height: 28.15%;
+  background-image: url("../images/tv-right.png");
+}
+/* line 322, main.scss */
+.container #tv .facade.bottom {
+  width: 100%;
+  height: 61.36%;
+  top: 38.15%;
+  background-image: url("../images/tv-bottom.png");
+}
+/* line 334, main.scss */
+.container #tv #noise, .container #tv #screen, .container #tv #screenBg {
+  position: absolute;
+  left: 8%;
+  top: 8%;
+  width: 64.8%;
+  height: 33.64%;
+}
+/* line 341, main.scss */
+.container #tv #screenBg {
+  background-color: #000;
+  z-index: 1;
+}
+/* line 345, main.scss */
+.container #tv #noise {
+  z-index: 15;
+  background-image: url("../images/noise.gif");
+  background-position-x: 90px;
+  background-position-y: 90px;
+  -webkit-transition: opacity .5s ease;
+          transition: opacity .5s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+/* line 354, main.scss */
+.container #tv #noise.visible {
+  opacity: 1;
+}
+/* line 358, main.scss */
+.container #tv #screen {
+  z-index: 13;
+}

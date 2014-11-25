@@ -50,16 +50,20 @@ module.exports = function (grunt) {
       }
     },
 
+
+    //RSYNC doesn't respect grunt variables.
     rsync: {
       options: {
-        args: ["--verbose"],
+      //  args: ["--verbose"],
+        recursive:true,
         exclude: [".git*", "*.scss", "node_modules"]
       },
       dist: {
         options: {
-          src: "<&= config.dist %>/",
+          expand:true,
+          src: "dist/",
           host:"betamaxmas@www.betamaxmas.com",
-          dest:"/betamaxmas/betamaxmas.com/v2/"
+          dest:"/home/betamaxmas/betamaxmas.com/v2/"
           //Define these on a per-project basis
           //host:"user@hostname"
           //dest: "/path/to/webroot"
@@ -184,14 +188,13 @@ module.exports = function (grunt) {
     // Add vendor prefixed styles
     autoprefixer: {
       options: {
-        browsers: ['> 1%', 'last 2 versions', 'Firefox ESR', 'Opera 12.1']
+        browsers: ['> 1%']
       },
       dist: {
         files: [{
           expand: true,
-          cwd: '.tmp/styles/',
-          src: '{,*/}*.css',
-          dest: '.tmp/styles/'
+          cwd:'<%= config.app %>/styles/',
+          src: '{,*/}*.css'
         }]
       }
     },
@@ -360,7 +363,7 @@ module.exports = function (grunt) {
     'useminPrepare',
    // 'concurrent:dist',
     'compass',
-    'autoprefixer',
+    'autoprefixer:dist',
     'imagemin',
     'svgmin',
     'concat',
@@ -368,10 +371,10 @@ module.exports = function (grunt) {
     'uglify',
     'copy:dist',
     'modernizr',
-   // 'rev',
+    'rev',
     'usemin',
     'htmlmin',
-   // 'rsync'
+    'rsync'
   ]);
 
   grunt.registerTask('default', [

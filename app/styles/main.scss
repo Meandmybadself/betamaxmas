@@ -61,17 +61,18 @@ html,body {
 	
 	&:after {
 		transition:box-shadow 2s ease;
-		box-shadow: inset 0 0 15em 5em #000000;
+		box-shadow: inset 0 0 15em 6em #000000;
 		position: absolute;
 		top: 0;
 		left: 0;
 		width: 100%;
 		height: 100%;
-		z-index: 10;
+		z-index: 9;
 		content: "";
 	}
 
 	#about-note {
+		visibility:hidden;
 		cursor:pointer;
 		top:50%;
 		left:50%;
@@ -87,6 +88,7 @@ html,body {
 		background-size:100%;
 		background-image:url('../images/about.png');
 		&.show {
+			visibility:visible;
 			opacity:1;
 			margin-top:-120px;
 		}
@@ -108,13 +110,18 @@ html,body {
 		
 		&.left {
 			transform: rotateZ(-1deg);
+			-webkit-transform: rotateZ(-1deg);
 			top:-35px;
 			right:-25px;
 			background-image:url('../images/posters/01.jpg');
+			@media (max-width:600px) {
+				display:none;
+			}
 
 		}
 		&.right {
 			transform: rotateZ(2deg);
+			-webkit-transform: rotateZ(2deg);
 			top:0px;
 			left:-40px;
 			background-image:url('../images/posters/02.jpg');
@@ -131,7 +138,7 @@ html,body {
 		bottom:-50px;
 		width:1419px;
 		height:285px;
-		z-index:6;
+		z-index:18;
 		background-image:url('../images/couch.png');
 		left:50%;
 		margin-left:-700px;
@@ -145,7 +152,7 @@ html,body {
 		background-image:url('../images/remote.png');
 		width:150px;
 		height:308px;
-		z-index:4;
+		z-index:17;
 		@media (max-width:780px) {
 			display:none;
 		}
@@ -179,30 +186,51 @@ html,body {
 	}
 
 	#footer {
-		width:591px;
-		height:95px;
+
+		@media (min-width:401px) {
+			width:591px;
+			height:95px;
+			margin-left:-300px;
+			div {
+				top:57%;
+			}
+		}
+
+		@media (max-width:400px) {
+			width:350px;
+			height:56px;
+			margin-left:-175px;
+			div {
+				top:68%;
+				font-size:.6em;
+			}
+		}
+
+		
 		position:absolute;
 		left:0;
 		bottom:20px;
 		left:50%;
-		margin-left:-300px;
+		
 		background-image:url('../images/footer.png');
-		z-index:11;
+		background-size:100%;
+		z-index:19;
 		font-family: 'Oswald', sans-serif;
+
 		div {
 			position:absolute;
-			top:55px;
+			
 			&#about {
-				left:90px;
+				left:15%;
 			}
 			&#mail {
-				left:180px;
+				left:30%;
 			}
 			&#v1 {
-				left:270px;
+				left:45%;
 			}
 			&#pr {
-				left:373px;
+				left:63%;
 			}
 			a {
 				text-decoration:none;
@@ -223,6 +251,7 @@ html,body {
 		
 		position:absolute;
 		width:25%;
+
 		#time {
 			width:6.9%;
 			height:1.9%;
@@ -230,9 +259,9 @@ html,body {
 			background-repeat:no-repeat;
 			background-image:url('../images/time.png');
 			position:absolute;
-			z-index:6;
+			z-index:21;
 			left:54.5%;
-			top:57.25%;
+			top:52%;
 			transition:opacity 3s ease-in-out;
 			animation: blink 3s steps(5, start) infinite;
   			-webkit-animation: blink normal 3s infinite;
@@ -248,32 +277,64 @@ html,body {
 
 			&.left {
 				left:44%;
-				transform-origin: 0% 50%;
-				transform: rotate(-135deg);
+				-webkit-transform-origin: 0% 50%;
+				-webkit-transform: rotateZ(-135deg);
+				transform: rotateZ(-135deg);
 			}
 			&.right {
 				left:51%;
-				transform-origin: 0% 50%;
-				transform: rotate(-45deg);
+				-webkit-transform-origin: 0% 50%;
+				-webkit-transform: rotateZ(-45deg);
+				transform: rotateZ(-45deg);
+			}
+		}
+		
+		.facade {
+			position:absolute;
+			z-index:16;
+			$w:100%;
+			$mt:10%;
+			$mh:28.15%;
+			background-size:100%;
+
+			&.top {
+				top:0;
+				left:0;
+				width:$w;
+				height:$mt;
+				background-image:url('../images/tv-top.png');
+			}
+
+			&.left, &.right {
+				top:$mt;
+			}
+			&.left {
+				width:11%;
+				height:$mh;
+				background-image:url('../images/tv-left.png');
+			}
+			&.right {
+				width:30.16%;
+				right:0;
+				height:$mh;
+				background-image:url('../images/tv-right.png');
+			}
+			&.bottom {
+				width:$w;
+				height:61.36%;
+				top:$mt + $mh;
+				//bottom:0;
+				background-image:url('../images/tv-bottom.png');
 			}
 		}
 		
 
-		#facade {
-			background-image:url('../images/tv.png');
-			background-size:100%;
-			width:100%;
-			height:100%;
-			position:absolute;
-			top:0;
-			left:0;
-			z-index:5;
-			opacity:1;
-		}
+
+	
 		#noise, #screen, #screenBg {
 			position:absolute;
-			left:8.3%;
-			top:10.13%;
+			left:8%;
+			top:8%;
 			width:64.8%;
 			height:33.64%;
 		}
@@ -282,18 +343,20 @@ html,body {
 			z-index:1;
 		}
 		#noise {
-			z-index:3;
+			z-index:15;
 			background-image:url('../images/noise.gif');
 
 			background-position-x:90px;
 			background-position-y:90px;
 			transition:opacity .5s ease;
-			&.playing {
-				opacity:0;
+			opacity:0;
+			visibility:hidden;
+			&.visible {
+				opacity:1;
 			}
 		}
 		#screen {
-			z-index:2;
+			z-index:13;
 		}
 	}
 }

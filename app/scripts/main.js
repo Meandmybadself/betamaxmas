@@ -30,11 +30,6 @@ var TVGuide = Class.extend({
 
 		//Find the start of the playlist.
 		playtime = 0;
-
-
-
-
-
 	}
 });
 
@@ -129,6 +124,7 @@ var Betamaxmas = Class.extend(
 			this.changeChannelByIndex(randChannelIndex);
 			this.onResize();
 			$(window).resize($.proxy(this.onResize, this));
+
 			$('.container').addClass('started');
 			$('#about').click($.proxy(this.onAboutClick, this));
 			$('#about-note').click($.proxy(this.onAboutCloseClick, this));
@@ -148,25 +144,40 @@ var Betamaxmas = Class.extend(
 		onPlayerReady: function() {
 			//console.log('onPlayerReady', arguments);
 		},
+
+		showNoise: function() {
+			clearTimeout(this.hideNoiseId);
+			$('#noise').css('visibility','visible');
+			$('#noise').addClass('visible');
+		},
+		hideNoise: function() {
+			$('#noise').removeClass('visible');
+			clearTimeout(this.hideNoiseId);
+			this.hideNoiseId = setTimeout(function() { $('#noise').css('visibility','hidden'); console.log('boop')}, 400);
+		},
 		onPlayerStateChange: function(st) {
 
-			//console.log('onPlayerStateChange', st.data);
 			switch(st.data) {
 				case -1: //unstarted
 				break;
 				case 0: //ended
+					this.showNoise();
 					this.nextVideo();
-					$('#noise').removeClass('playing');
+					
 				break;
 				case 1: //playing
-					$('#noise').addClass('playing');
-					this.player.mute();
+					this.hideNoise();
+					if (document.location.hostname.indexOf('local') > -1) {
+						//Shut up.
+						this.player.mute();
+					}
 				break;
 				case 2: //paused
 				case 5:
 				break;
 				case 3: //buffering
-					$('#noise').removeClass('playing');
+					this.showNoise();
+					//('#noise').removeClass('playing');
 				break;
 			}
 		},
@@ -272,7 +283,7 @@ var Betamaxmas = Class.extend(
 
 			//original tv size  600x865
 			ow 		= 600,
-			oh 		= 865,
+			oh 		= 942,
 
 			//space from the top of the tv image to the top of the tv.
 			oybuff 	= 50,
@@ -304,6 +315,9 @@ var Betamaxmas = Class.extend(
 
 
 		//UTILITIES
+		isiOS: function() {
+			return ( navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false );
+		},
 		getNow: function() {
 			return (new Date).getTime();
 		},
