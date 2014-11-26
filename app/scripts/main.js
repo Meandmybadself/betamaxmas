@@ -34,17 +34,20 @@ var TVGuide = Class.extend({
 });
 
 var RemoteControl = Class.extend({
-	init: function(volumeUpHandler, volumeDownHandler, channelUpHandler, channelDownHandler) {
+	init: function(volumeUpHandler, volumeDownHandler, channelUpHandler, channelDownHandler, fullscreenHandler) {
 		this.volumeDownHandler = volumeDownHandler;
 		this.volumeUpHandler = volumeUpHandler;
 
 		this.channelDownHandler = channelDownHandler;
 		this.channelUpHandler = channelUpHandler;
 
+		this.fullscreenHandler = fullscreenHandler;
+
 		$('#remote #chan-up').click($.proxy(this.clickHandler, this));
 		$('#remote #chan-down').click($.proxy(this.clickHandler, this));
 		$('#remote #vol-up').click($.proxy(this.clickHandler, this));
 		$('#remote #vol-down').click($.proxy(this.clickHandler, this));
+		$('#remote #fullscreen').click($.proxy(this.clickHandler, this));
 	},
 	lock: function() {
 		this.isLocked = true;
@@ -68,6 +71,9 @@ var RemoteControl = Class.extend({
 			break;
 			case 'vol-down':
 				this.volumeDownHandler();
+			break;
+			case 'fullscreen':
+				this.fullscreenHandler();
 			break;
 		}
 	}
@@ -102,7 +108,6 @@ var Betamaxmas = Class.extend(
 			this.startTime 	= this.getNow();
 
 			this.tvguide  	= new TVGuide(this.playlist, this.startTime);
-			console.log(playlist);
 			this.injectYTScript();
 		},
 
@@ -118,16 +123,30 @@ var Betamaxmas = Class.extend(
 		},
 		onYTPlayerReady: function() {
 			//Set up remote.
-			this.remote = new RemoteControl($.proxy(this.onVolumeUpClick, this), $.proxy(this.onVolumeDownClick, this), $.proxy(this.onChannelUpClick, this), $.proxy(this.onChannelDownClick, this));
+			this.remote = new RemoteControl($.proxy(this.onVolumeUpClick, this), 
+				$.proxy(this.onVolumeDownClick, this), 
+				$.proxy(this.onChannelUpClick, this), 
+				$.proxy(this.onChannelDownClick, this),
+				$.proxy(this.onFullscreenClick, this));
 
 			var randChannelIndex = this.getRandomInt(0, this.playlist.channels.length-1);
 			this.changeChannelByIndex(randChannelIndex);
 			this.onResize();
+			$(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange MSFullscreenChange',$.proxy(this.onFullscreenChange, this));
 			$(window).resize($.proxy(this.onResize, this));
-
 			$('.container').addClass('started');
 			$('#about').click($.proxy(this.onAboutClick, this));
 			$('#about-note').click($.proxy(this.onAboutCloseClick, this));
+		},
+		onFullscreenChange:function() {
+			console.log('change', $('#container').hasClass('fullscreen'));
+			if ($('#container').hasClass('fullscreen')) {
+				console.log('removing!');
+				$('#container').removeClass('fullscreen');
+			} else {
+				console.log('adding!');
+				$('#container').addClass('fullscreen');
+			}
 		},
 		onAboutClick: function() {
 			if (!$('#about-note').hasClass('show')) {
@@ -153,7 +172,7 @@ var Betamaxmas = Class.extend(
 		hideNoise: function() {
 			$('#noise').removeClass('visible');
 			clearTimeout(this.hideNoiseId);
-			this.hideNoiseId = setTimeout(function() { $('#noise').css('visibility','hidden'); console.log('boop')}, 400);
+			this.hideNoiseId = setTimeout(function() { $('#noise').css('visibility','hidden'); }, 400);
 		},
 		onPlayerStateChange: function(st) {
 
@@ -212,7 +231,6 @@ var Betamaxmas = Class.extend(
 			}
 			var title = currentShow.show.title;
 			document.title = "betamaxmas - " + title;
-			console.log('Now playing ' + title + ' with an offset of: ' + currentShow.offset);
 
 		},
 		onVolumeUpClick: function() {
@@ -230,6 +248,9 @@ var Betamaxmas = Class.extend(
 		},
 		onChannelDownClick: function() {
 			this.prevChannel();
+		},
+		onFullscreenClick: function() {
+			this.goFullscreen(document.getElementById('container'));
 		},
 
 		//CHANNELS
@@ -292,7 +313,7 @@ var Betamaxmas = Class.extend(
 			ovw 	= 389,
 			ovh 	= 291,
 
-			nw 		= Math.max(360, 0.3 * ww),
+			nw 		= Math.max(360, 0.4 * ww),
 			per 	= nw / ow,
 			nh 		= per * oh,
 			
@@ -301,18 +322,39 @@ var Betamaxmas = Class.extend(
 			left 		= (ww - nw) * .5
 		
 
-			$('#tv').css({
+			$('#tv, #tvShadow').css({
 				'width':nw,
 				'height':nh,
 				'left':left,
 				'top':top
-			})
-
-			
+			});
 
 			//what percentage of 600
 		},
 
+		goFullscreen: function(element) {
+			if(element.requestFullscreen) {
+		    element.requestFullscreen();
+		  } else if(element.mozRequestFullScreen) {
+		    element.mozRequestFullScreen();
+		  } else if(element.webkitRequestFullscreen) {
+		    element.webkitRequestFullscreen();
+		  } else if(element.msRequestFullscreen) {
+		    element.msRequestFullscreen();
+		  }
+		},
+		exitFullscreen: function() {
+			if(document.exitFullscreen) {
+			    document.exitFullscreen();
+			  } else if(document.mozCancelFullScreen) {
+			    document.mozCancelFullScreen();
+			  } else if(document.webkitExitFullscreen) {
+			    document.webkitExitFullscreen();
+			  }
+		},
+		isFullscreen: function() {
+			return  (screen.width == window.innerWidth && screen.height == window.innerHeight);
+		},
 
 		//UTILITIES
 		isiOS: function() {

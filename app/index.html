@@ -3,14 +3,51 @@
   <head>
     <meta charset="utf-8">
     <title>betamaxmas</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width">
-    <link rel="shortcut icon" href="/favicon.ico">
+   <meta name="language" content="en" />
+  <meta name="description" content="A radical world wide web page for returning to yesteryear via the power of video and my basement. How very." />
+  <meta name="keywords" content="Nostalgia, holidays, video" />
+    <meta name="viewport" content="width=380" />
+
+  <!--
+                 _.--"""""-.._
+     __        .'_ _          '.
+    /  \      / ` ` `'-.        `\
+    |   \/|   \_ ___ _  `\        \
+    \  _..;    )` _ `_"--.\       |
+    ;"     \   |  a/ a    (`\     |   HO³
+    |    _.;   /_.<_..___, )\\    |
+    \_.-'  |  ;-.__,__..-'  '.'.  /   
+      |    ;  /            (  ) \_|
+      |     \(   (      (     )/   \
+       \     (       (       .'\   /
+        \ ,   \           _.'   '-'`.
+         `|    '-(.___.--' ,;,-\_,   \
+          |         o:  .-'(())_/     ;
+          ;          :  |.-'  / `'.   |
+           \        o:  \   .-\    \ _/
+            ;--._   _:_  \ /   \    |\
+            )    `'|.-.|"'\\__.-`'-'\|
+           /``'-.._||_||_..\      _.'
+          /        '-;-'    \__.-'  \
+        /``'--..__   :       __..--'``\
+        \_        ```````````        _/
+          `'--,...__       __...,--'`
+              |     ```;```     |
+              \        |        /
+               \_ _  _ | _ _ _ /
+               /` ` ` `|` ` ` `\
+               \_._._./ \._._._/
+                |=    | |    =|
+             .--'-.   | |   .-'--.
+            /         | |         \
+            \______,__/ \__,______/
+  //-->
+  <link rel="shortcut icon" href="favicon.ico">
+
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
 
-    <meta name="viewport" content="width=450,user-scalable=0" />
     <!-- endbower -->
     <!-- endbuild -->
     <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
@@ -28,7 +65,7 @@
     <![endif]-->
 
 
-    <div class="container">
+    <div class="container" id="container">
       <div id="about-note"></div>
       <div id="tv">
         <div id="time"></div> 
@@ -42,11 +79,13 @@
         <div id="screen"></div>
         <div id="screenBg"></div>
       </div>
+      <div id="tvShadow"></div>
       <div id="remote">
         <div id="chan-up" class="chan btn up"></div>
         <div id="chan-down" class="chan btn down"></div>
         <div id="vol-up" class="vol btn up"></div>
         <div id="vol-down" class="vol btn down"></div>
+        <div id="fullscreen" class="btn fullscreen"></div>
       </div>
 
     <div class="poster left"></div>
@@ -57,7 +96,6 @@
     <div id="footer">
       <div id='about'><a href='#'>About</a></div>
       <div id='mail'><a href='mailto:jeffery@betamaxmas.com'>Email</a></div>
-      <div id='v1'><a href='./v1/'>Version 1</a></div>
       <div id='pr'><a href='http://permanentrecord.io'>By Permanent Record</a></div>
     </div>
     </div>
@@ -76,7 +114,7 @@
       e=o.createElement(i);r=o.getElementsByTagName(i)[0];
       e.src='//www.google-analytics.com/analytics.js';
       r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
-      ga('create','UA-XXXXX-X');ga('send','pageview');
+      ga('create','UA-6527076-1');ga('send','pageview');
     </script>
 
         <!-- build:js({app,.tmp}) scripts/main.js -->

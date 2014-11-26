@@ -1,5 +1,3 @@
-// Generated on 2014-11-19 using
-// generator-webapp 0.5.1
 'use strict';
 
 // # Globbing
@@ -35,7 +33,7 @@ module.exports = function (grunt) {
           imagesDir:'<%= config.app %>/images',
           fontsDir:'<% config.app %>/fonts',
           sassDir:'<%= config.app %>/styles',
-          cssDir:'<%= config.app %>/styles'
+          cssDir:'.tmp/styles'
         }
       },
       dist: {
@@ -54,19 +52,15 @@ module.exports = function (grunt) {
     //RSYNC doesn't respect grunt variables.
     rsync: {
       options: {
-      //  args: ["--verbose"],
         recursive:true,
-        exclude: [".git*", "*.scss", "node_modules"]
+        exclude: [".git*", "*.scss", "node_modules", "*.map"]
       },
       dist: {
         options: {
           expand:true,
           src: "dist/",
           host:"betamaxmas@www.betamaxmas.com",
-          dest:"/home/betamaxmas/betamaxmas.com/v2/"
-          //Define these on a per-project basis
-          //host:"user@hostname"
-          //dest: "/path/to/webroot"
+          dest:"/home/betamaxmas/betamaxmas.com/"
         }
       }
     },
@@ -80,14 +74,6 @@ module.exports = function (grunt) {
         files: ['<%= config.app %>/styles/{,*/}*.{scss,sass}'],
         tasks: ['compass', 'autoprefixer']
       },
-      // sass: {
-      //   files: ['<%= config.app %>/styles/{,*/}*.{scss,sass}'],
-      //   tasks: ['sass:server', 'autoprefixer']
-      // },
-      // styles: {
-      //   files: ['<%= config.app %>/styles/{,*/}*.css'],
-      //   tasks: ['newer:copy:styles', 'autoprefixer']
-      // },
       livereload: {
         options: {
           livereload: '<%= connect.options.livereload %>'
@@ -96,7 +82,8 @@ module.exports = function (grunt) {
           '<%= config.app %>/scripts/{,*/}*.js',
           '<%= config.app %>/{,*/}*.html',
           '<%= config.app %>/styles/{,*/}*.css',
-          '<%= config.app %>/images/{,*/}*'
+          '<%= config.app %>/images/{,*/}*',
+          '.tmp/styles/{,*/}*.css'
         ]
       }
     },
@@ -115,20 +102,6 @@ module.exports = function (grunt) {
           middleware: function(connect) {
             return [
               connect.static('.tmp'),
-              connect().use('/bower_components', connect.static('./bower_components')),
-              connect.static(config.app)
-            ];
-          }
-        }
-      },
-      test: {
-        options: {
-          open: false,
-          port: 9001,
-          middleware: function(connect) {
-            return [
-              connect.static('.tmp'),
-              connect.static('test'),
               connect().use('/bower_components', connect.static('./bower_components')),
               connect.static(config.app)
             ];
@@ -299,12 +272,6 @@ module.exports = function (grunt) {
         }, {
           src: 'node_modules/apache-server-configs/dist/.htaccess',
           dest: '<%= config.dist %>/.htaccess'
-        }, {
-          expand: true,
-          dot: true,
-          cwd: '.',
-          src: 'bower_components/bootstrap-sass-official/assets/fonts/bootstrap/*',
-          dest: '<%= config.dist %>'
         }]
       },
       // styles: {
@@ -359,16 +326,25 @@ module.exports = function (grunt) {
 
 
   grunt.registerTask('build', [
+    //Removes the previous dist directory.
     'clean:dist',
+    //Not really sure what this does, but you need it for usemin.
     'useminPrepare',
-   // 'concurrent:dist',
-    'compass',
+    //CSS / Spriting
+    'compass:dist',
+    //Autoprefixes
     'autoprefixer:dist',
+    //Smooshes images.
     'imagemin',
+    //Smooshes SVGs.
     'svgmin',
+    //Combines JS?
     'concat',
+    //Minifies CSS
     'cssmin',
+    //Smooshes JS?
     'uglify',
+    //Copies all the other shit.
     'copy:dist',
     'modernizr',
     'rev',
