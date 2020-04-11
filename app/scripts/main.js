@@ -115,11 +115,11 @@ class Betamaxmas {
 
   //PLAYLIST
   loadPlaylist() {
-    $.getJSON(this.cfg.playlistURL, $.proxy(this.onPlaylistLoaded, this)).error(
-      function () {
-        alert("Couldn't communicate with server.  Please try again.");
-      }
-    );
+    try {
+      $.getJSON(this.cfg.playlistURL, $.proxy(this.onPlaylistLoaded, this));
+    } catch (e) {
+      alert("Couldn't communicate with server.  Please try again.");
+    }
     this.channel = Math.rand;
   }
 
