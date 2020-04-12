@@ -1,14 +1,17 @@
-<!doctype html>
+<!DOCTYPE html>
 <html class="no-js">
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>betamaxmas</title>
-   <meta name="language" content="en" />
-  <meta name="description" content="A radical world wide web page for returning to yesteryear via the power of video and my basement. How very." />
-  <meta name="keywords" content="Nostalgia, holidays, video" />
+    <meta name="language" content="en" />
+    <meta
+      name="description"
+      content="A radical world wide web page for returning to yesteryear via the power of video and my basement. How very."
+    />
+    <meta name="keywords" content="Nostalgia, holidays, video" />
     <meta name="viewport" content="width=380" />
 
-  <!--
+    <!--
                  _.--"""""-.._
      __        .'_ _          '.
     /  \      / ` ` `'-.        `\
@@ -42,33 +45,19 @@
             /         | |         \
             \______,__/ \__,______/
   //-->
-  <link rel="shortcut icon" href="favicon.ico">
-
-    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <!-- build:css(.) styles/vendor.css -->
-    <!-- bower:css -->
-
-    <!-- endbower -->
-    <!-- endbuild -->
-    <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
-    <!-- build:css(.tmp) styles/main.css -->
-    <link rel="stylesheet" href="styles/main.css">
-    <!-- endbuild -->
-    <!-- build:js scripts/vendor/modernizr.js -->
-    <script src="bower_components/modernizr/modernizr.js"></script>
-    <!-- endbuild -->
-
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link
+      href="http://fonts.googleapis.com/css?family=Oswald"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link rel="stylesheet" href="styles/main.scss" />
   </head>
   <body>
-    <!--[if lt IE 10]>
-      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-    <![endif]-->
-
-
     <div class="container" id="container">
       <div id="about-note"></div>
       <div id="tv">
-        <div id="time"></div> 
+        <div id="time"></div>
         <div class="facade top"></div>
         <div class="facade left"></div>
         <div class="facade bottom"></div>
@@ -88,37 +77,37 @@
         <div id="fullscreen" class="btn fullscreen"></div>
       </div>
 
-    <div class="poster left"></div>
-    <div class="poster right"></div>
+      <div class="poster left"></div>
+      <div class="poster right"></div>
 
-    <div id="couch"></div>
+      <div id="couch"></div>
 
-    <div id="footer">
-      <div id='about'><a href='#'>About</a></div>
-      <div id='mail'><a href='mailto:jeffery@betamaxmas.com'>Email</a></div>
-      <div id='pr'><a href='http://permanentrecord.io'>By Permanent Record</a></div>
+      <div id="footer">
+        <div id="about"><a href="#">About</a></div>
+        <div id="mail"><a href="mailto:jeffery@betamaxmas.com">Email</a></div>
+        <div id="pr">
+          <a href="http://permanentrecord.io">By Permanent Record</a>
+        </div>
+      </div>
     </div>
-    </div>
 
-    <!-- build:js(.) scripts/vendor.js -->
-    <!-- bower:js -->
-      <script src="bower_components/jquery/dist/jquery.min.js"></script>
-      <script src="bower_components/Class.js/Class.js"></script>
-    <!-- endbower -->
-    <!-- endbuild -->
-
-    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
     <script>
-      (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
-      function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
-      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
-      e.src='//www.google-analytics.com/analytics.js';
-      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
-      ga('create','UA-6527076-1');ga('send','pageview');
+      (function (b, o, i, l, e, r) {
+        b.GoogleAnalyticsObject = l;
+        b[l] ||
+          (b[l] = function () {
+            (b[l].q = b[l].q || []).push(arguments);
+          });
+        b[l].l = +new Date();
+        e = o.createElement(i);
+        r = o.getElementsByTagName(i)[0];
+        e.src = "//www.google-analytics.com/analytics.js";
+        r.parentNode.insertBefore(e, r);
+      })(window, document, "script", "ga");
+      ga("create", "UA-6527076-1");
+      ga("send", "pageview");
     </script>
 
-        <!-- build:js({app,.tmp}) scripts/main.js -->
-        <script src="scripts/main.js"></script>
-        <!-- endbuild -->
-</body>
+    <script src="scripts/main.js"></script>
+  </body>
 </html>

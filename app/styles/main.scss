@@ -1,419 +1,424 @@
-@import "compass/reset";
-
-//Sprites - http://compass-style.org/help/tutorials/spriting/
-@import "compass/utilities/sprites";
-@import "spritesrc/*.png";
-@include all-spritesrc-sprites;
-
 * {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
-html,body {
-	background-color:#000;
-	height:100%;
+html,
+body {
+  background-color: #000;
+  height: 100%;
 }
 
 @keyframes blink {
-	0% {
-		opacity:0;
-	}
-	48% {
-		opacity:0;
-	}
-	51% {
-		opacity:1;
-	}
-	100% {
-		opacity:1;
-	}
-}
-@-webkit-keyframes blink {
   0% {
-		opacity:0;
-	}
-	48% {
-		opacity:0;
-	}
-	51% {
-		opacity:1;
-	}
-	100% {
-		opacity:1;
-	}
+    opacity: 0;
+  }
+  48% {
+    opacity: 0;
+  }
+  51% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  48% {
+    opacity: 0;
+  }
+  51% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .container {
+  $dep: 0;
 
-	$dep:0;
+  $dep-backWall: $dep;
+  $dep: $dep + 1;
+  $dep-poster-1: $dep;
+  $dep: $dep + 1;
+  $dep-poster-2: $dep;
+  $dep: $dep + 1;
+  $dep-tvShadow: $dep;
+  $dep: $dep + 1;
+  $dep-screenBG: $dep;
+  $dep: $dep + 1;
+  $dep-container: $dep;
+  $dep: $dep + 1;
+  $dep-screen: $dep;
+  $dep: $dep + 1;
+  $dep-noise: $dep;
+  $dep: $dep + 1;
+  $dep-tv-left: $dep;
+  $dep: $dep + 1;
+  $dep-tv-top: $dep;
+  $dep: $dep + 1;
+  $dep-tv-right: $dep;
+  $dep: $dep + 1;
+  $dep-tv-btm: $dep;
+  $dep: $dep + 1;
+  $dep-tv-time: $dep;
+  $dep: $dep + 1;
+  $dep-antenna-left: $dep;
+  $dep: $dep + 1;
+  $dep-antenna-right: $dep;
+  $dep: $dep + 1;
+  $dep-tv-top: $dep;
+  $dep: $dep + 1;
+  $dep-remote: $dep;
+  $dep: $dep + 1;
+  $dep-couch: $dep;
+  $dep: $dep + 1;
+  $dep-about: $dep;
+  $dep: $dep + 1;
+  $dep-footer: $dep;
+  $dep: $dep + 1;
 
-	$dep-backWall:$dep; $dep:$dep + 1;
-	$dep-poster-1:$dep; $dep:$dep + 1;
-	$dep-poster-2:$dep; $dep:$dep + 1;
-	$dep-tvShadow:$dep; $dep:$dep + 1;
-	$dep-screenBG:$dep; $dep:$dep + 1;
-	$dep-container:$dep; $dep:$dep + 1;
-	$dep-screen:$dep; $dep:$dep + 1;
-	$dep-noise:$dep; $dep:$dep + 1;
-	$dep-tv-left:$dep; $dep:$dep + 1;
-	$dep-tv-top:$dep; $dep:$dep + 1;
-	$dep-tv-right:$dep; $dep:$dep + 1;
-	$dep-tv-btm:$dep; $dep:$dep + 1;
-	$dep-tv-time:$dep; $dep:$dep + 1;
-	$dep-antenna-left:$dep; $dep:$dep + 1;
-	$dep-antenna-right:$dep; $dep:$dep + 1;
-	$dep-tv-top:$dep; $dep:$dep + 1;
-	$dep-remote:$dep; $dep:$dep + 1;
-	$dep-couch:$dep; $dep:$dep + 1;
-	$dep-about:$dep; $dep:$dep + 1;
-	$dep-footer:$dep; $dep:$dep + 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-image: url("../images/bg.jpg");
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 1s ease-out, transform 1s ease-out;
+  transform-origin: 50% 50%;
+  z-index: $dep-backWall;
 
-	display:block;
-	width:100%;
-	height:100%;
-	background-image:url('../images/bg.jpg');
-	position:absolute;
-	top:0;
-	left:0;
-	overflow:hidden;
-	opacity:0;
-	transition:opacity 1s ease-out, transform 1s ease-out;
-	transform-origin:50% 50%;
-	z-index:$dep-backWall;
+  &.started {
+    opacity: 1;
+  }
 
-	&.started {
-		opacity:1;
-	}
+  &.fullscreen {
+    transform: scale3d(1.4, 1.4, 1);
+  }
 
-	&.fullscreen {
-		transform:scale3d(1.4,1.4,1);
-	}
-	
-	&:after {
-		box-shadow: inset 0 0 15em 6em #000000;
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: $dep-container;
-		content: "";
-	}
+  &:after {
+    box-shadow: inset 0 0 15em 6em #000000;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: $dep-container;
+    content: "";
+  }
 
-	#about-note {
-		visibility:hidden;
-		cursor:pointer;
-		top:50%;
-		left:50%;
-		opacity:0;
-		transition:opacity .3s ease-out, margin-top .3s ease-out;
-		margin-left:-200px;
-		margin-top:-100px;
-		width:400px;
-		height:241px;
+  #about-note {
+    visibility: hidden;
+    cursor: pointer;
+    top: 50%;
+    left: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease-out, margin-top 0.3s ease-out;
+    margin-left: -200px;
+    margin-top: -100px;
+    width: 400px;
+    height: 241px;
 
-		position:absolute;
-		z-index:$dep-about;
-		background-size:100%;
-		background-image:url('../images/about.png');
-		&.show {
-			visibility:visible;
-			opacity:1;
-			margin-top:-120px;
-		}
-	}
+    position: absolute;
+    z-index: $dep-about;
+    background-size: 100%;
+    background-image: url("../images/about.png");
+    &.show {
+      visibility: visible;
+      opacity: 1;
+      margin-top: -120px;
+    }
+  }
 
+  .poster {
+    position: absolute;
 
-	.poster {
-		position:absolute;
+    display: block;
+    width: 330px;
+    height: 500px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 1);
+    filter: blur(2px);
 
-		display:block;
-		width:330px;
-		height:500px;
-		background-size:100%;
-		background-repeat:no-repeat;
-		box-shadow:0px 0px 2px 2px rgba(0,0,0,1);
-		filter: blur(10px);
-		
-		
-		&.left {
-			z-index:$dep-poster-1;
-			transform: rotateZ(-1deg);
-			-webkit-transform: rotateZ(-1deg);
-			top:-35px;
-			right:-25px;
-			background-image:url('../images/posters/01.jpg');
-			@media (max-width:600px) {
-				display:none;
-			}
+    &.left {
+      z-index: $dep-poster-1;
+      transform: rotateZ(-1deg);
+      transform: rotateZ(-1deg);
+      top: -35px;
+      right: -25px;
+      background-image: url("../images/posters/01.jpg");
+      @media (max-width: 600px) {
+        display: none;
+      }
+    }
+    &.right {
+      z-index: $dep-poster-2;
+      transform: rotateZ(2deg);
+      transform: rotateZ(2deg);
+      top: 0px;
+      left: -40px;
+      background-image: url("../images/posters/02.jpg");
+      @media (max-width: 600px) {
+        display: none;
+      }
+    }
+  }
 
-		}
-		&.right {
-			z-index:$dep-poster-2;
-			transform: rotateZ(2deg);
-			-webkit-transform: rotateZ(2deg);
-			top:0px;
-			left:-40px;
-			background-image:url('../images/posters/02.jpg');
-			@media (max-width:600px) {
-				display:none;
-			}
-		}
-	}
+  #couch {
+    position: absolute;
+    @media (max-width: 401px) {
+      bottom: -125px;
+    }
+    @media (min-width: 401px) {
+      bottom: -50px;
+    }
+    width: 1419px;
+    height: 285px;
+    z-index: $dep-couch;
+    background-image: url("../images/couch.svg");
+    left: 50%;
+    margin-left: -700px;
+    transform: translateZ(-1px);
+  }
 
-	
+  #remote {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    margin-top: -150px;
+    background-image: url("../images/remote.svg");
+    width: 150px;
+    height: 308px;
+    z-index: $dep-remote;
+    @media (max-width: 780px) {
+      display: none;
+    }
+    .btn {
+      &:hover {
+        cursor: pointer;
+        box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);
+      }
+      cursor: pointer;
+      position: absolute;
+      width: 25px;
+      height: 25px;
+      background-color: transparent;
+      box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+      transition: box-shadow 0.2s ease;
+      &.down {
+        top: 125px;
+        background-image: url("../images/remote-btn-down.png");
+      }
+      &.up {
+        top: 80px;
+        background-image: url("../images/remote-btn-up.png");
+      }
+      &.chan {
+        left: 38px;
+      }
+      &.vol {
+        left: 83px;
+      }
+      &.fullscreen {
+        top: 173px;
+        left: 90px;
+        width: 26px;
+        height: 26px;
+        background-image: url("../images/fullscreen-btn.png");
+      }
+    }
+  }
 
-	#couch {
-		position:absolute;
-		@media (max-width:401px) {
-			bottom:-125px;
-		}
-		@media (min-width:401px) {
-			bottom:-50px;
-		}
-		width:1419px;
-		height:285px;
-		z-index:$dep-couch;
-		background-image:url('../images/couch.svg');
-		left:50%;
-		margin-left:-700px;
-		transform: translateZ(-1px);
-	}
+  #footer {
+    position: absolute;
+    left: 0;
+    bottom: 20px;
+    left: 50%;
 
-	#remote {
-		position:absolute;
-		right:60px;
-		top:50%;
-		margin-top:-150px;
-		background-image:url('../images/remote.svg');
-		width:150px;
-		height:308px;
-		z-index:$dep-remote;
-		@media (max-width:780px) {
-			display:none;
-		}
-		.btn {
-			&:hover {
-				cursor:pointer;
-				box-shadow:0px 0px 0px rgba(0,0,0,0);
-			}
-			cursor:pointer;
-			position:absolute;
-			width:25px;
-			height:25px;
-			background-color:transparent;
-			box-shadow:2px 2px 2px rgba(0,0,0,0.5);
-			transition:box-shadow .2s ease;
-			&.down {
-				top:125px;
-				background-image:url('../images/remote-btn-down.png');
-			}
-			&.up {
-				top:80px;
-				background-image:url('../images/remote-btn-up.png');	
-			}
-			&.chan {
-				left:38px;
-			}
-			&.vol {
-				left:83px;
-			}
-			&.fullscreen {
-				top:173px;
-				left:90px;
-				width:26px;
-				height:26px;
-				background-image:url('../images/fullscreen-btn.png');	
-			}
-		}
-	}
+    background-image: url("../images/footer.png");
+    background-size: 100%;
+    z-index: $dep-footer;
+    font-family: "Oswald", sans-serif;
 
-	#footer {
+    @media (min-width: 401px) {
+      width: 591px;
+      height: 95px;
+      margin-left: -300px;
+      div {
+        top: 57%;
+      }
+    }
 
-		position:absolute;
-		left:0;
-		bottom:20px;
-		left:50%;
-		
-		background-image:url('../images/footer.png');
-		background-size:100%;
-		z-index:$dep-footer;
-		font-family: 'Oswald', sans-serif;
+    @media (max-width: 400px) {
+      width: 350px;
+      height: 56px;
+      margin-left: -175px;
+      div {
+        top: 68%;
+        font-size: 0.6em;
+      }
+    }
 
-		@media (min-width:401px) {
-			width:591px;
-			height:95px;
-			margin-left:-300px;
-			div {
-				top:57%;
-			}
-		}
+    div {
+      position: absolute;
 
-		@media (max-width:400px) {
-			width:350px;
-			height:56px;
-			margin-left:-175px;
-			div {
-				top:68%;
-				font-size:.6em;
-			}
-		}
+      &#about {
+        left: 15%;
+      }
+      &#mail {
+        left: 40%;
+      }
 
-	
+      &#pr {
+        left: 63%;
+      }
+      a {
+        text-decoration: none;
+        color: #444;
+        text-transform: uppercase;
+        transition: color 0.1s ease-in-out;
+        text-shadow: 0 0 2px rgba(0, 0, 0, 0.25);
+        &:hover {
+          color: #a58a50;
+        }
+      }
+    }
+  }
 
-		div {
-			position:absolute;
-			
-			&#about {
-				left:15%;
-			}
-			&#mail {
-				left:40%;
-			}
-			
-			&#pr {
-				left:63%;
-			}
-			a {
-				text-decoration:none;
-				color:#444;
-				text-transform:uppercase;
-				transition:color .1s ease-in-out;
-				text-shadow: 0 0 2px rgba(0,0,0,0.25);
-				&:hover {
-					color:#A58A50;
-				}
-			}
-		}
-	}
+  #tvShadow {
+    position: absolute;
+    width: 25%;
+    background-color: rgba(20, 0, 0, 0.7);
+    box-shadow: 0px 0px 55px 25px rgba(20, 0, 0, 0.7);
+    margin-top: 30px;
+  }
 
+  #tv {
+    position: absolute;
 
-	#tvShadow {
-		position:absolute;
-		width:25%;
-		background-color:rgba(20,0,0,.7);
-		box-shadow:0px 0px 55px 25px rgba(20,0,0,.7);
-		margin-top:30px;
-	}
+    #time {
+      width: 6.9%;
+      height: 1.9%;
+      background-size: 100%;
+      background-repeat: no-repeat;
+      background-image: url("../images/time.png");
+      position: absolute;
+      z-index: $dep-tv-time;
+      left: 54.5%;
+      top: 52%;
+      transition: opacity 3s ease-in-out;
+      animation: blink 3s steps(5, start) infinite;
+      animation: blink normal 3s infinite;
+    }
 
-	
-	#tv {
-		
-		position:absolute;
+    .antenna {
+      display: block;
+      background-image: url("../images/antenna.png");
+      width: 292px;
+      height: 9px;
+      position: absolute;
 
-		#time {
-			width:6.9%;
-			height:1.9%;
-			background-size:100%;
-			background-repeat:no-repeat;
-			background-image:url('../images/time.png');
-			position:absolute;
-			z-index:$dep-tv-time;
-			left:54.5%;
-			top:52%;
-			transition:opacity 3s ease-in-out;
-			animation: blink 3s steps(5, start) infinite;
-  			-webkit-animation: blink normal 3s infinite;
-		}
+      &.left {
+        z-index: $dep-antenna-left;
+        left: 44%;
+        transform-origin: 0% 50%;
+        transform: rotateZ(-135deg);
+        transform: rotateZ(-135deg);
+      }
+      &.right {
+        z-index: $dep-antenna-right;
+        left: 51%;
+        transform-origin: 0% 50%;
+        transform: rotateZ(-45deg);
+        transform: rotateZ(-45deg);
+      }
+    }
 
-		.antenna {
-			display:block;
-			background-image:url('../images/antenna.png');
-			width:292px;
-			height:9px;
-			position:absolute;
+    .facade {
+      position: absolute;
+      $w: 100%;
+      $mt: 9.9%;
+      $mh: 28.15%;
+      background-size: 100%;
 
-			&.left {
-				z-index:$dep-antenna-left;
-				left:44%;
-				-webkit-transform-origin: 0% 50%;
-				-webkit-transform: rotateZ(-135deg);
-				transform: rotateZ(-135deg);
-			}
-			&.right {
-				z-index:$dep-antenna-right;
-				left:51%;
-				-webkit-transform-origin: 0% 50%;
-				-webkit-transform: rotateZ(-45deg);
-				transform: rotateZ(-45deg);
-			}
-		}
-		
-		.facade {
-			position:absolute;
-			$w:100%;
-			$mt:9.9%;
-			$mh:28.15%;
-			background-size:100%;
+      &.top {
+        z-index: $dep-tv-top;
+        top: 0;
+        left: 0;
+        width: $w;
+        height: $mt;
+        background-image: url("../images/tv-top.svg");
+      }
 
-			&.top {
-				z-index:$dep-tv-top;
-				top:0;
-				left:0;
-				width:$w;
-				height:$mt;
-				background-image:url('../images/tv-top.svg');
-			}
+      &.left,
+      &.right {
+        top: $mt;
+      }
+      &.left {
+        z-index: $dep-tv-left;
+        width: 11%;
+        height: $mh;
+        background-image: url("../images/tv-left.svg");
+      }
+      &.right {
+        z-index: $dep-tv-right;
+        width: 30.16%;
+        right: 0;
+        height: $mh;
+        background-image: url("../images/tv-right.svg");
+      }
+      &.bottom {
+        z-index: $dep-tv-btm;
+        width: $w;
+        height: 61.36%;
+        top: 38%;
+        background-image: url("../images/tv-bottom.svg");
+      }
+    }
 
-			&.left, &.right {
-				top:$mt;
-			}
-			&.left {
-				z-index:$dep-tv-left;
-				width:11%;
-				height:$mh;
-				background-image:url('../images/tv-left.svg');
-			}
-			&.right {
-				z-index:$dep-tv-right;
-				width:30.16%;
-				right:0;
-				height:$mh;
-				background-image:url('../images/tv-right.svg');
-			}
-			&.bottom {
-				z-index:$dep-tv-btm;
-				width:$w;
-				height:61.36%;
-				top:38%;
-				background-image:url('../images/tv-bottom.svg');
-			}
-		}
-	
-		#noise, #screen, #screenBg {
-			position:absolute;
-			left:8%;
-			top:8%;
-			width:64.8%;
-			height:33.64%;
-		}
-		#noise, #screen {
-			-webkit-box-shadow: inset 0px 0px 20px 4px rgba(0,0,0,1);
-			-moz-box-shadow: inset 0px 0px 20px 4px rgba(0,0,0,1);
-			box-shadow: inset 0px 0px 20px 4px rgba(0,0,0,1);
-		}
-		#screenBg {
-			background-color:#000;
-			z-index:$dep-screenBG;
-		}
-		#noise {
-			z-index:$dep-noise;
-			background-image:url('../images/noise.gif');
-			background-position-x:90px;
-			background-position-y:90px;
-			transition:opacity 1s ease;
-			opacity:0;
-			visibility:hidden;
-			-webkit-box-shadow: inset 0px 0px 10px 4px rgba(0,0,0,1);
-			-moz-box-shadow: inset 0px 0px 10px 4px rgba(0,0,0,1);
-			box-shadow: inset 0px 0px 10px 4px rgba(0,0,0,1);
-			&.visible {
-				opacity:1;
-			}
-		}
-		iframe#screen {
-			z-index:$dep-screen;
-		}
-	}
+    #noise,
+    #screen,
+    #screenBg {
+      position: absolute;
+      left: 8%;
+      top: 8%;
+      width: 64.8%;
+      height: 33.64%;
+    }
+    #noise,
+    #screen {
+      box-shadow: inset 0px 0px 20px 4px rgba(0, 0, 0, 1);
+      -moz-box-shadow: inset 0px 0px 20px 4px rgba(0, 0, 0, 1);
+      box-shadow: inset 0px 0px 20px 4px rgba(0, 0, 0, 1);
+    }
+    #screenBg {
+      background-color: #000;
+      z-index: $dep-screenBG;
+    }
+    #noise {
+      z-index: $dep-noise;
+      background-image: url("../images/noise.gif");
+      background-position-x: 90px;
+      background-position-y: 90px;
+      transition: opacity 1s ease;
+      opacity: 0;
+      visibility: hidden;
+      box-shadow: inset 0px 0px 10px 4px rgba(0, 0, 0, 1);
+      -moz-box-shadow: inset 0px 0px 10px 4px rgba(0, 0, 0, 1);
+      box-shadow: inset 0px 0px 10px 4px rgba(0, 0, 0, 1);
+      &.visible {
+        opacity: 1;
+      }
+    }
+    iframe#screen {
+      z-index: $dep-screen;
+    }
+  }
 }
-
