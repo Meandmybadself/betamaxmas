@@ -98,10 +98,10 @@ class Betamaxmas {
   constructor() {
     this.config = {
       dev: {
-        playlistURL: "/data",
+        playlistURL: "/data/",
       },
       prod: {
-        playlistURL: "/data",
+        playlistURL: "/data/",
       },
     };
 
