@@ -1,6 +1,3 @@
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request, event.env));
-});
 
 async function handleRequest(request, env) {
   // Handle CORS preflight requests
@@ -174,5 +171,11 @@ class Video {
     const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
     const [, hours = 0, minutes = 0, seconds = 0] = match;
     return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds);
+  }
+}
+
+export default {
+  async fetch(request, env) {
+    return handleRequest(request, env)
   }
 }
