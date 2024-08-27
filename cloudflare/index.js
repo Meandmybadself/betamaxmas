@@ -1,37 +1,41 @@
+// Constants
+const CACHE_KEY = 'playlist_cache';
+const TIMESTAMP_KEY = 'last_update_timestamp';
+const PLAYLISTS = ['PLEE193C2FEDC59D2F'];
+const CHANNEL_NAMES = ['21', '27', '33'];
+const VIDEO_LIMIT = 50;
 
+// CORS headers
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': 'https://betamaxmas.com',
+  'Access-Control-Allow-Methods': 'GET, HEAD, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Max-Age': '86400',
+};
+
+// Main handler
 async function handleRequest(request, env) {
-  // Handle CORS preflight requests
   if (request.method === 'OPTIONS') {
-    return handleCORS(request);
+    return handleCORS();
   }
 
   const url = new URL(request.url);
-  if (url.pathname !== '/playlist') {
-    return new Response('Not found', { status: 404 });
+  if (url.pathname === '/playlist') {
+    const response = await getPlaylist(request, env);
+    return addCORSHeaders(response);
   }
 
-  const channels = new Channels(env);
-  const response = await channels.getPlaylist(request);
-
-  // Add CORS headers to the actual response
-  return addCORSHeaders(response);
+  return new Response('Not found', { status: 404 });
 }
 
-function handleCORS(request) {
-  // Handle CORS preflight request
-  return new Response(null, {
-    status: 204,
-    headers: corsHeaders,
-  });
+// CORS handlers
+function handleCORS() {
+  return new Response(null, { status: 204, headers: CORS_HEADERS });
 }
 
 function addCORSHeaders(response) {
-  // Clone the response and add CORS headers
   const newHeaders = new Headers(response.headers);
-  Object.entries(corsHeaders).forEach(([key, value]) => {
-    newHeaders.set(key, value);
-  });
-
+  Object.entries(CORS_HEADERS).forEach(([key, value]) => newHeaders.set(key, value));
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
@@ -39,128 +43,144 @@ function addCORSHeaders(response) {
   });
 }
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://betamaxmas.com',
-  'Access-Control-Allow-Methods': 'GET, HEAD, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Access-Control-Max-Age': '86400',
-};
+// Playlist functions
+async function getPlaylist(request, env) {
+  const url = new URL(request.url);
+  const noCache = url.searchParams.has('nocache');
 
-class Channels {
-  constructor(env) {
-    this.CACHE_TIME = 86400; // 24 hours
-    this.CACHE_KEY = 'playlist_cache';
-    this.PLAYLISTS = ['PLEE193C2FEDC59D2F'];
-    this.CHANNEL_NAMES = ['21', '27', '33'];
-    this.API_KEY = env.YOUTUBE_API_KEY
-    // this.KV = env.BETAMAXMAS;
+  let output = noCache ? null : await getCachedPlaylist(env.CHANNELS);
+
+  if (!output) {
+    output = await getPlaylistsFromYT(env.YOUTUBE_API_KEY);
+    await cachePlaylist(env.CHANNELS, output);
   }
 
-  async getPlaylist(request) {
-    const url = new URL(request.url);
-    const noCache = url.searchParams.has('nocache');
+  return new Response(JSON.stringify({
+    cached: !noCache && output !== null,
+    time: Date.now(),
+    channels: output
+  }, null, 2), {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
 
-    let output = noCache ? null : await this.getCachedPlaylist();
+async function getCachedPlaylist(kv) {
+  try {
+    const cachedData = await kv.get(CACHE_KEY, 'json');
+    const lastUpdateTimestamp = await kv.get(TIMESTAMP_KEY, 'text');
 
-    if (!output) {
-      output = await this.getPlaylistsFromYT();
-      await this.cachePlaylist(output);
+    if (cachedData && lastUpdateTimestamp) {
+      const currentDate = new Date();
+      const lastUpdateDate = new Date(parseInt(lastUpdateTimestamp));
+
+      // Check if the cache is from today
+      if (currentDate.toDateString() === lastUpdateDate.toDateString()) {
+        console.log('Retrieved playlist from cache');
+        return cachedData;
+      }
     }
-
-    return new Response(JSON.stringify({
-      cached: !noCache,
-      time: Date.now(),
-      channels: output
-    }, null, 2), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+  } catch (error) {
+    console.error('Error retrieving from cache:', error);
   }
+  return null;
+}
 
-  async getCachedPlaylist() {
-    // This is a placeholder. Implement using Cloudflare KV or other storage
-    // return await NAMESPACE.get(this.CACHE_KEY);
-    return null;
-  }
-
-  async cachePlaylist(output) {
-    // This is a placeholder. Implement using Cloudflare KV or other storage
-    // await NAMESPACE.put(this.CACHE_KEY, JSON.stringify(output), {expirationTtl: this.CACHE_TIME});
-  }
-
-  async getPlaylistsFromYT() {
-    const videos = await this.fetchAllVideos();
-    return this.groupVideosByChannel(videos);
-  }
-
-  async fetchAllVideos() {
-    const videos = [];
-    for (const playlistId of this.PLAYLISTS) {
-      let pageToken = null;
-      do {
-        const playlist = await this.loadPlaylist(playlistId, pageToken);
-        if (!playlist) break;
-
-        const validVideos = await Promise.all(playlist.items.map(async item => {
-          const video = await this.loadVideo(item.snippet.resourceId.videoId);
-          return video && video.items[0]?.status.embeddable ? new Video(item.snippet, video) : null;
-        }));
-
-        videos.push(...validVideos.filter(Boolean));
-        pageToken = playlist.nextPageToken;
-      } while (pageToken);
-    }
-    return videos;
-  }
-
-  groupVideosByChannel(videos) {
-    const channels = this.CHANNEL_NAMES.map(name => ({ number: name, duration: 0, shows: [] }));
-
-    videos.forEach((video, index) => {
-      const channelIndex = index % this.CHANNEL_NAMES.length;
-      channels[channelIndex].shows.push({
-        id: video.id,
-        title: video.title,
-        duration: video.duration
-      });
-      channels[channelIndex].duration += video.duration;
-    });
-
-    return channels;
-  }
-
-  async loadPlaylist(id, pageToken = null) {
-    const params = new URLSearchParams({
-      maxResults: '50',
-      part: 'snippet',
-      playlistId: id,
-      key: this.API_KEY,
-      ...(pageToken && { pageToken })
-    });
-
-    const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?${params}`);
-    if (!response.ok) return null;
-
-    const data = await response.json();
-    return data.items?.length ? data : null;
-  }
-
-  async loadVideo(id) {
-    const params = new URLSearchParams({
-      part: 'contentDetails,status',
-      id: id,
-      key: this.API_KEY
-    });
-
-    const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?${params}`);
-    return response.ok ? response.json() : null;
+async function cachePlaylist(kv, output) {
+  try {
+    const currentTimestamp = Date.now();
+    await kv.put(CACHE_KEY, JSON.stringify(output));
+    await kv.put(TIMESTAMP_KEY, currentTimestamp.toString());
+    console.log('Playlist cached successfully');
+  } catch (error) {
+    console.error('Error caching playlist:', error);
   }
 }
 
+async function getPlaylistsFromYT(apiKey) {
+  const videos = await fetchAllVideos(apiKey);
+  return groupVideosByChannel(videos);
+}
+
+async function fetchAllVideos(apiKey) {
+  const videos = [];
+  for (const playlistId of PLAYLISTS) {
+    let pageToken = null;
+    do {
+      const playlist = await loadPlaylist(playlistId, pageToken, apiKey);
+      if (!playlist) break;
+
+      const videoIds = playlist.items.map(item => item.snippet.resourceId.videoId);
+      const validVideos = await loadVideos(videoIds, apiKey);
+      videos.push(...validVideos);
+      pageToken = playlist.nextPageToken;
+    } while (pageToken);
+  }
+  return videos;
+}
+
+function groupVideosByChannel(videos) {
+  return CHANNEL_NAMES.map((name, index) => ({
+    number: name,
+    duration: 0,
+    shows: videos.filter((_, i) => i % CHANNEL_NAMES.length === index)
+      .map(video => {
+        return {
+          id: video.id,
+          title: video.title,
+          duration: video.duration
+        };
+      })
+  })).map(channel => {
+    channel.duration = channel.shows.reduce((sum, show) => sum + show.duration, 0);
+    return channel;
+  });
+}
+
+// YouTube API functions
+async function loadPlaylist(id, pageToken, apiKey) {
+  const params = new URLSearchParams({
+    maxResults: VIDEO_LIMIT,
+    part: 'snippet',
+    playlistId: id,
+    key: apiKey,
+    ...(pageToken && { pageToken })
+  });
+
+  const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?${params}`);
+  if (!response.ok) {
+    console.error('Error loading playlist:', response.statusText);
+    return null;
+  }
+
+  const data = await response.json();
+  return data.items?.length ? data : null;
+}
+
+async function loadVideos(ids, apiKey) {
+  const params = new URLSearchParams({
+    part: 'snippet,contentDetails,status',
+    id: ids.join(','),
+    key: apiKey
+  });
+
+  const requestURL = `https://www.googleapis.com/youtube/v3/videos?${params}`;
+  const response = await fetch(requestURL);
+
+  if (!response.ok) {
+    console.error('Error loading videos:', response.statusText);
+    return [];
+  }
+
+  const data = await response.json();
+  return data.items.map(item => new Video(item.snippet, item));
+}
+
+// Video class
 class Video {
   constructor(snippet, video) {
-    this.id = snippet.resourceId.videoId;
+    this.id = video.id;
     this.title = Video.toTitleCase(snippet.title);
-    this.duration = Video.parseDuration(video.items[0].contentDetails.duration);
+    this.duration = Video.parseDuration(video.contentDetails.duration);
   }
 
   static toTitleCase(str) {
@@ -176,6 +196,6 @@ class Video {
 
 export default {
   async fetch(request, env) {
-    return handleRequest(request, env)
+    return handleRequest(request, env);
   }
 }
