@@ -1,65 +1,45 @@
-const $ = require("jquery");
-
+// TVGuide class
 class TVGuide {
   constructor(channelData, start) {
-    var c,
-      s,
-      show,
-      playTime,
-      longestDurationTime,
-      sortedChannelData = [];
+    this.channelData = channelData;
+    this.start = start;
+    this.sortedChannelData = this.sortChannelData();
+    this.longestDurationTime = this.findLongestDuration();
+    this.localStart = start % this.longestDurationTime;
+  }
 
-    for (var c = 0; c < channelData.channels.length; c++) {
-      playTime = 0;
-      for (var s = 0; s < channelData.channels[c].shows.length; s++) {
-        show = channelData.channels[c].shows[s];
+  sortChannelData() {
+    let sortedData = [];
+    for (const channel of this.channelData.channels) {
+      let playTime = 0;
+      for (const show of channel.shows) {
         show.start = playTime;
-        sortedChannelData.push(channelData.channels[c].shows[s]);
+        sortedData.push(show);
         playTime += show.duration;
       }
     }
+    return sortedData.sort((a, b) => a.start - b.start);
+  }
 
-    sortedChannelData.sort(function (a, b) {
-      a > b ? -1 : 1;
-    });
-
-    //We now have a sorted playlist to run through, but it's start time was on Jan 1, 1970.
-    //What is the longest runtime of any of the channels?
-    longestDurationTime = Number.NEGATIVE_INFINITY;
-    for (c = 0; c < channelData.channels.length; c++) {
-      if (channelData.channels[c].duration > longestDurationTime) {
-        longestDurationTime = channelData.channels[c].duration;
-      }
-    }
-
-    var localStart = start % longestDurationTime;
-
-    //Find the start of the playlist.
-    playtime = 0;
+  findLongestDuration() {
+    return Math.max(...this.channelData.channels.map(channel => channel.duration));
   }
 }
 
+// RemoteControl class
 class RemoteControl {
-  constructor(
-    volumeUpHandler,
-    volumeDownHandler,
-    channelUpHandler,
-    channelDownHandler,
-    fullscreenHandler
-  ) {
-    this.volumeDownHandler = volumeDownHandler;
-    this.volumeUpHandler = volumeUpHandler;
+  constructor(handlers) {
+    this.handlers = handlers;
+    this.isLocked = false;
 
-    this.channelDownHandler = channelDownHandler;
-    this.channelUpHandler = channelUpHandler;
+    this.setupEventListeners();
+  }
 
-    this.fullscreenHandler = fullscreenHandler;
-
-    $("#remote #chan-up").click($.proxy(this.clickHandler, this));
-    $("#remote #chan-down").click($.proxy(this.clickHandler, this));
-    $("#remote #vol-up").click($.proxy(this.clickHandler, this));
-    $("#remote #vol-down").click($.proxy(this.clickHandler, this));
-    $("#remote #fullscreen").click($.proxy(this.clickHandler, this));
+  setupEventListeners() {
+    const remoteButtons = ['chan-up', 'chan-down', 'vol-up', 'vol-down', 'fullscreen'];
+    remoteButtons.forEach(id => {
+      document.getElementById(id).addEventListener('click', (e) => this.clickHandler(e));
+    });
   }
 
   lock() {
@@ -71,253 +51,230 @@ class RemoteControl {
   }
 
   clickHandler(e) {
-    if (this.isLocked) {
-      return;
-    }
-    switch ($(e.currentTarget).attr("id")) {
-      case "chan-up":
-        this.channelUpHandler();
-        break;
-      case "chan-down":
-        this.channelDownHandler();
-        break;
-      case "vol-up":
-        this.volumeUpHandler();
-        break;
-      case "vol-down":
-        this.volumeDownHandler();
-        break;
-      case "fullscreen":
-        this.fullscreenHandler();
-        break;
+    if (this.isLocked) return;
+    const action = e.target.id;
+    if (this.handlers[action]) {
+      this.handlers[action]();
     }
   }
 }
 
+// Betamaxmas class
 class Betamaxmas {
   constructor() {
-    this.config = {
-      dev: {
-        playlistURL: "/data/",
-      },
-      prod: {
-        playlistURL: "/data/",
-      },
-    };
-
-    if (document.location.hostname.indexOf("local") > -1) {
-      this.cfg = this.config["dev"];
-    } else {
-      this.cfg = this.config["prod"];
-    }
+    this.apiEndpoint = 'https://api.betamaxmas.com/playlist';
     this.loadPlaylist();
   }
 
-  //PLAYLIST
   loadPlaylist() {
-    try {
-      $.getJSON(this.cfg.playlistURL, $.proxy(this.onPlaylistLoaded, this));
-    } catch (e) {
-      alert("Couldn't communicate with server.  Please try again.");
-    }
-    this.channel = Math.rand;
+    fetch(this.apiEndpoint)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(playlist => this.onPlaylistLoaded(playlist))
+      .catch(error => {
+        console.error('Error fetching playlist:', error);
+        alert("Couldn't communicate with server. Please try again later.");
+      });
   }
 
   onPlaylistLoaded(playlist) {
     this.playlist = playlist;
     this.startTime = this.getNow();
-
     this.tvguide = new TVGuide(this.playlist, this.startTime);
     this.injectYTScript();
   }
 
-  //YOUTUBE - https://developers.google.com/youtube/iframe_api_reference
   injectYTScript() {
-    window.onYouTubeIframeAPIReady = $.proxy(this.onYTPlayerReady, this);
-
-    //Load iframe js
-    var tag = document.createElement("script");
+    window.onYouTubeIframeAPIReady = () => this.onYTPlayerReady();
+    const tag = document.createElement("script");
     tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName("script")[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    document.getElementsByTagName("script")[0].parentNode.appendChild(tag);
   }
 
   onYTPlayerReady() {
-    //Set up remote.
-    this.remote = new RemoteControl(
-      $.proxy(this.onVolumeUpClick, this),
-      $.proxy(this.onVolumeDownClick, this),
-      $.proxy(this.onChannelUpClick, this),
-      $.proxy(this.onChannelDownClick, this),
-      $.proxy(this.onFullscreenClick, this)
-    );
+    this.setupRemote();
+    this.setupEventListeners();
+    document.querySelector(".container").classList.add("started");
+    this.initializeFromHash();
+  }
 
-    var randChannelIndex = this.getRandomInt(
-      0,
-      this.playlist.channels.length - 1
-    );
-    this.changeChannelByIndex(randChannelIndex);
+  setupRemote() {
+    this.remote = new RemoteControl({
+      'vol-up': () => this.onVolumeUpClick(),
+      'vol-down': () => this.onVolumeDownClick(),
+      'chan-up': () => this.onChannelUpClick(),
+      'chan-down': () => this.onChannelDownClick(),
+      'fullscreen': () => this.onFullscreenClick()
+    });
+  }
+
+  setupEventListeners() {
+    document.addEventListener("fullscreenchange", () => this.onFullscreenChange());
+    window.addEventListener("resize", () => this.onResize());
+    document.getElementById("about").addEventListener("click", () => this.onAboutClick());
+    document.getElementById("about-note").addEventListener("click", () => this.onAboutCloseClick());
+    window.addEventListener("hashchange", () => this.onHashChange());
+  }
+
+  initializeFromHash() {
+    const hash = window.location.hash.substring(1);
+    const channelIndex = parseInt(hash, 10);
+    if (!isNaN(channelIndex) && channelIndex >= 0 && channelIndex < this.playlist.channels.length) {
+      this.changeChannelByIndex(channelIndex);
+    } else {
+      this.changeChannelByIndex(this.getRandomInt(0, this.playlist.channels.length - 1));
+    }
     this.onResize();
-    $(document).on(
-      "webkitfullscreenchange mozfullscreenchange fullscreenchange MSFullscreenChange",
-      $.proxy(this.onFullscreenChange, this)
-    );
-    $(window).resize($.proxy(this.onResize, this));
-    $(".container").addClass("started");
-    $("#about").click($.proxy(this.onAboutClick, this));
-    $("#about-note").click($.proxy(this.onAboutCloseClick, this));
   }
+
+  onHashChange() {
+    const hash = window.location.hash.substring(1);
+    const channelIndex = parseInt(hash, 10);
+    if (!isNaN(channelIndex) && channelIndex >= 0 && channelIndex < this.playlist.channels.length) {
+      this.changeChannelByIndex(channelIndex);
+    }
+  }
+
+  updateHash(index) {
+    history.pushState(null, null, `#${index}`);
+  }
+
   onFullscreenChange() {
-    if ($("#container").hasClass("fullscreen")) {
-      $("#container").removeClass("fullscreen");
-    } else {
-      $("#container").addClass("fullscreen");
-    }
+    document.getElementById("container").classList.toggle("fullscreen");
   }
+
   onAboutClick() {
-    if (!$("#about-note").hasClass("show")) {
-      $("#about-note").addClass("show");
-    } else {
-      this.onAboutCloseClick();
-    }
+    document.getElementById("about-note").classList.toggle("show");
   }
+
   onAboutCloseClick() {
-    if ($("#about-note").hasClass("show")) {
-      $("#about-note").removeClass("show");
-    }
-  }
-  onPlayerReady() {
-    //console.log('onPlayerReady', arguments);
+    document.getElementById("about-note").classList.remove("show");
   }
 
   showNoise() {
     clearTimeout(this.hideNoiseId);
-    $("#noise").css("visibility", "visible");
-    $("#noise").addClass("visible");
+    const noise = document.getElementById("noise");
+    noise.style.visibility = "visible";
+    noise.classList.add("visible");
   }
+
   hideNoise() {
-    $("#noise").removeClass("visible");
+    const noise = document.getElementById("noise");
+    noise.classList.remove("visible");
     clearTimeout(this.hideNoiseId);
-    this.hideNoiseId = setTimeout(function () {
-      $("#noise").css("visibility", "hidden");
+    this.hideNoiseId = setTimeout(() => {
+      noise.style.visibility = "hidden";
     }, 400);
   }
+
   onPlayerStateChange(st) {
     switch (st.data) {
-      case -1: //unstarted
-        break;
-      case 0: //ended
+      case YT.PlayerState.ENDED:
         this.showNoise();
         this.nextVideo();
-
         break;
-      case 1: //playing
+      case YT.PlayerState.PLAYING:
         this.hideNoise();
-        if (document.location.hostname.indexOf("local") > -1) {
-          //Shut up.
+        if (document.location.hostname.includes("local")) {
           this.player.mute();
         }
         break;
-      case 2: //paused
-      case 5:
-        break;
-      case 3: //buffering
+      case YT.PlayerState.BUFFERING:
         this.showNoise();
-        //('#noise').removeClass('playing');
         break;
     }
   }
-  //Next video
+
   nextVideo() {
-    var currentShow = this.getCurrentShow();
+    const currentShow = this.getCurrentShow();
     if (!this.player) {
-      this.player = new YT.Player("screen", {
-        width: $("#screen").width(),
-        height: $("#screen").height(),
-        videoId: currentShow.show.id,
-        playerVars: {
-          disablekb: true,
-          autoplay: 1,
-          controls: 0,
-          enablejsapi: true,
-          iv_load_policy: 3,
-          modestbranding: 1,
-          origin: document.location.hostname,
-          playsinline: 1,
-          rel: 0,
-          showinfo: 0,
-          start: currentShow.offset,
-        },
-        events: {
-          onReady: $.proxy(this.onPlayerReady, this),
-          onStateChange: $.proxy(this.onPlayerStateChange, this),
-        },
-      });
+      this.createPlayer(currentShow);
     } else {
       this.player.loadVideoById(currentShow.show.id, currentShow.offset);
     }
-    var title = currentShow.show.title;
-    document.title = "betamaxmas - " + title;
+    document.title = `betamaxmas - ${currentShow.show.title}`;
+  }
+
+  createPlayer(currentShow) {
+    const screenElement = document.getElementById("screen");
+    this.player = new YT.Player("screen", {
+      width: screenElement.offsetWidth,
+      height: screenElement.offsetHeight,
+      videoId: currentShow.show.id,
+      playerVars: {
+        disablekb: 1,
+        autoplay: 1,
+        controls: 0,
+        enablejsapi: 1,
+        iv_load_policy: 3,
+        modestbranding: 1,
+        origin: document.location.hostname,
+        playsinline: 1,
+        rel: 0,
+        showinfo: 0,
+        start: currentShow.offset
+      },
+      events: {
+        onReady: () => this.onPlayerReady(),
+        onStateChange: (st) => this.onPlayerStateChange(st)
+      }
+    });
   }
 
   onVolumeUpClick() {
-    var currentVolume = this.player.getVolume(),
-      newVolume = currentVolume + 10;
-    this.player.setVolume(newVolume);
+    const currentVolume = this.player.getVolume();
+    this.player.setVolume(currentVolume + 10);
   }
+
   onVolumeDownClick() {
-    var currentVolume = this.player.getVolume(),
-      newVolume = currentVolume - 10;
-    this.player.setVolume(newVolume);
+    const currentVolume = this.player.getVolume();
+    this.player.setVolume(currentVolume - 10);
   }
+
   onChannelUpClick() {
     this.nextChannel();
   }
+
   onChannelDownClick() {
     this.prevChannel();
   }
+
   onFullscreenClick() {
     this.goFullscreen(document.getElementById("container"));
   }
 
-  //CHANNELS
   getCurrentShow() {
-    //Where are we at in the current channel playlist?
-    var now = this.getPlaylistNow() % this.channel.duration,
-      show,
-      showIndex = 0,
-      shows = this.channel.shows;
-    while (now > 0) {
-      show = shows[showIndex++];
-      now -= show.duration;
+    const now = this.getPlaylistNow() % this.channel.duration;
+    let showTime = 0;
+    for (const show of this.channel.shows) {
+      if (showTime + show.duration > now) {
+        return { show, offset: now - showTime };
+      }
+      showTime += show.duration;
     }
-
-    return {
-      show: show,
-      offset: -now,
-    };
   }
 
   changeChannelByIndex(index) {
-    //Where are we in the current playlist?
-    if (index == this.channelIndex) {
-      //Trying to change channels to the same channel.
-      return;
-    } else if (index >= this.playlist.channels.length) {
-      //Wrapping back around to the beginning.
+    if (index === this.channelIndex) return;
+
+    if (index >= this.playlist.channels.length) {
       index = 0;
     } else if (index < 0) {
-      //Wrapping back around to the end.
       index = this.playlist.channels.length - 1;
     }
 
-    //Set current channel.
     this.channelIndex = index;
     this.channel = this.playlist.channels[this.channelIndex];
-    $("#noise").addClass("playing");
+    document.getElementById("noise").classList.add("playing");
 
+    this.updateHash(this.channelIndex);
     this.nextVideo();
   }
+
   nextChannel() {
     this.changeChannelByIndex(this.channelIndex + 1);
   }
@@ -327,31 +284,27 @@ class Betamaxmas {
   }
 
   onResize() {
-    var ww = $(window).width(),
-      wh = $(window).height(),
-      //original tv size  600x865
-      ow = 600,
-      oh = 942,
-      //space from the top of the tv image to the top of the tv.
-      oybuff = 50,
-      //original video size
-      ovw = 389,
-      ovh = 291,
-      nw = Math.max(360, 0.4 * ww),
-      per = nw / ow,
-      nh = per * oh,
-      //tv y
-      top = (wh - ovh * per) * 0.5 - oybuff * per - 100;
-    left = (ww - nw) * 0.5;
+    const ww = window.innerWidth;
+    const wh = window.innerHeight;
+    const ow = 600;
+    const oh = 942;
+    const oybuff = 50;
+    const ovh = 291;
+    const nw = Math.max(360, 0.4 * ww);
+    const per = nw / ow;
+    const nh = per * oh;
+    const top = (wh - ovh * per) * 0.5 - oybuff * per - 100;
+    const left = (ww - nw) * 0.5;
 
-    $("#tv, #tvShadow").css({
-      width: nw,
-      height: nh,
-      left: left,
-      top: top,
+    const tvElements = document.querySelectorAll("#tv, #tvShadow");
+    tvElements.forEach(el => {
+      Object.assign(el.style, {
+        width: `${nw}px`,
+        height: `${nh}px`,
+        left: `${left}px`,
+        top: `${top}px`
+      });
     });
-
-    //what percentage of 600
   }
 
   goFullscreen(element) {
@@ -365,6 +318,7 @@ class Betamaxmas {
       element.msRequestFullscreen();
     }
   }
+
   exitFullscreen() {
     if (document.exitFullscreen) {
       document.exitFullscreen();
@@ -374,25 +328,27 @@ class Betamaxmas {
       document.webkitExitFullscreen();
     }
   }
+
   isFullscreen() {
-    return (
-      screen.width == window.innerWidth && screen.height == window.innerHeight
-    );
+    return screen.width === window.innerWidth && screen.height === window.innerHeight;
   }
 
-  //UTILITIES
   isiOS() {
-    return navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false;
+    return /iPad|iPhone|iPod/.test(navigator.userAgent);
   }
+
   getNow() {
-    return new Date().getTime();
+    return Date.now();
   }
+
   getPlaylistNow() {
     return this.getNow() - this.startTime + this.playlist.time;
   }
+
   getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
   }
 }
 
-b = new Betamaxmas();
+// Initialize the application
+const betamaxmas = new Betamaxmas();
