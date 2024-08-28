@@ -1,18 +1,6 @@
 {
   "name": "betamaxmas",
   "scripts": {
-    "dev": "parcel serve app/index.html",
-    "build": "rm -rf ./dist && parcel build --no-source-maps app/index.html ./dist",
-    "promote": "yarn build && rsync -av ./dist/ mn:/var/www/static-sites/betamaxmas.com/client/"
-  },
-  "devDependencies": {
-    "parcel-bundler": "^1.12.4",
-    "sass": "^1.26.3"
-  },
-  "engines": {
-    "node": ">=0.10.0"
-  },
-  "dependencies": {
-    "jquery": "^3.5.0"
+    "dev": "python3 -m http.server 8000 --directory ./app"
   }
 }
