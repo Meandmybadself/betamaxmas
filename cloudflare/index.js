@@ -172,7 +172,9 @@ async function loadVideos(ids, apiKey) {
   }
 
   const data = await response.json();
-  return data.items.map(item => new Video(item.snippet, item));
+  return data.items
+    .filter(item => item.status.embeddable && item.status.privacyStatus === 'public')
+    .map(item => new Video(item.snippet, item));
 }
 
 // Video class
@@ -181,6 +183,8 @@ class Video {
     this.id = video.id;
     this.title = Video.toTitleCase(snippet.title);
     this.duration = Video.parseDuration(video.contentDetails.duration);
+    this.embeddable = video.status.embeddable;
+    this.privacyStatus = video.status.privacyStatus;
   }
 
   static toTitleCase(str) {
