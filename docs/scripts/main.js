@@ -63,6 +63,7 @@ class RemoteControl {
 class Betamaxmas {
   constructor() {
     this.apiEndpoint = 'https://api.betamaxmas.com/playlist';
+    this.isMuted = true;
     this.loadPlaylist();
   }
 
@@ -118,6 +119,20 @@ class Betamaxmas {
     document.getElementById("about").addEventListener("click", () => this.onAboutClick());
     document.getElementById("about-note").addEventListener("click", () => this.onAboutCloseClick());
     window.addEventListener("hashchange", () => this.onHashChange());
+    document.getElementById("container").addEventListener("click", (e) => this.onContainerClick(e));
+  }
+
+  onContainerClick(e) {
+    if (!this.isMuted) return;
+    // Don't unmute if clicking on interactive elements
+    if (e.target.closest('#remote, #footer, #about-note')) return;
+    this.unmute();
+  }
+
+  unmute() {
+    if (!this.isMuted || !this.player) return;
+    this.player.unMute();
+    this.isMuted = false;
   }
 
   initializeFromHash() {
@@ -179,14 +194,15 @@ class Betamaxmas {
         break;
       case YT.PlayerState.PLAYING:
         this.hideNoise();
-        if (document.location.hostname.includes("local")) {
-          this.player.mute();
-        }
         break;
       case YT.PlayerState.BUFFERING:
         this.showNoise();
         break;
     }
+  }
+
+  onPlayerReady() {
+    this.player.mute();
   }
 
   nextVideo() {
@@ -308,25 +324,11 @@ class Betamaxmas {
   }
 
   goFullscreen(element) {
-    if (element.requestFullscreen) {
-      element.requestFullscreen();
-    } else if (element.mozRequestFullScreen) {
-      element.mozRequestFullScreen();
-    } else if (element.webkitRequestFullscreen) {
-      element.webkitRequestFullscreen();
-    } else if (element.msRequestFullscreen) {
-      element.msRequestFullscreen();
-    }
+    element.requestFullscreen();
   }
 
   exitFullscreen() {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.mozCancelFullScreen) {
-      document.mozCancelFullScreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    }
+    document.exitFullscreen();
   }
 
   isFullscreen() {
